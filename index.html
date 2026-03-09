@@ -624,6 +624,31 @@
     margin-top: 6px;
   }
 
+
+  /* ── VALIDATION ERROR STATES ─────────────────────────── */
+  .q-card.error {
+    border-color: #f87171 !important;
+    animation: shake 0.35s ease;
+  }
+
+  .error-msg {
+    display: none;
+    font-size: 12px;
+    color: #f87171;
+    font-family: 'DM Mono', monospace;
+    margin-top: 10px;
+    letter-spacing: 0.05em;
+  }
+
+  .q-card.error .error-msg { display: block; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(6px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+  }
   /* ── MOBILE OPTIMIZATIONS ─────────────────────────────── */
   @media (max-width: 600px) {
 
@@ -1244,6 +1269,62 @@
   let currentSection = 1;
   const totalSections = 7;
 
+  // ── REQUIRED FIELDS PER SECTION ──────────────────────────────────────
+  // Each entry: { type, id/name, cardIndex (1-based within section) }
+  // optional:true means the field is skipped during validation
+  const REQUIRED = {
+    1: [
+      { type: 'text',     id: 'q_name',        label: 'Please enter your name.' },
+      { type: 'radio',    name: 'q_age',        label: 'Please select your age group.' },
+      { type: 'text',     id: 'q_neighborhood', label: 'Please enter your neighborhood.' },
+      { type: 'checkbox', ids: ['s1','s2','s3','s4','s5'], label: 'Please select at least one option.' },
+    ],
+    2: [
+      { type: 'radio', name: 'rs1',   label: 'Please select a rating.' },
+      { type: 'radio', name: 'rs2',   label: 'Please select a rating.' },
+      { type: 'radio', name: 'rs3',   label: 'Please select a rating.' },
+      { type: 'radio', name: 'rs4',   label: 'Please select a rating.' },
+      { type: 'radio', name: 'rs5',   label: 'Please select a rating.' },
+      { type: 'radio', name: 'q_mod', label: 'Please select a module.' },
+    ],
+    3: [
+      { type: 'radio', name: 'ic_xp',     label: 'Please rate your growth.' },
+      { type: 'radio', name: 'ic_val',    label: 'Please rate your growth.' },
+      { type: 'radio', name: 'ic_sk',     label: 'Please rate your growth.' },
+      { type: 'radio', name: 'ic_net',    label: 'Please rate your growth.' },
+      { type: 'radio', name: 'ic_cult',   label: 'Please rate your growth.' },
+      { type: 'radio', name: 'q_weakest', label: 'Please select an option.' },
+      { type: 'text',  id: 'q_growth',    label: 'Please answer this question.' },
+    ],
+    4: [
+      { type: 'radio', name: 'sturdy_s', label: 'Please select a rating.' },
+      { type: 'radio', name: 'sturdy_t', label: 'Please select a rating.' },
+      { type: 'radio', name: 'sturdy_u', label: 'Please select a rating.' },
+      { type: 'radio', name: 'sturdy_r', label: 'Please select a rating.' },
+      { type: 'radio', name: 'sturdy_d', label: 'Please select a rating.' },
+      { type: 'radio', name: 'sturdy_y', label: 'Please select a rating.' },
+      // Q13 (q_unsafe) is optional
+    ],
+    5: [
+      { type: 'text', id: 'q_decision', label: 'Please answer this question.' },
+      { type: 'text', id: 'q_hardest',  label: 'Please answer this question.' },
+      { type: 'text', id: 'q_pitch',    label: 'Please answer this question.' },
+      { type: 'text', id: 'q_stop',     label: 'Please answer this question.' },
+      { type: 'text', id: 'q_add',      label: 'Please answer this question.' },
+    ],
+    6: [
+      { type: 'checkbox', ids: ['p1','p2','p3','p4','p5','p6','p7','p8'], label: 'Please select at least one option.' },
+      { type: 'radio',    name: 'q_barrier',  label: 'Please select an option.' },
+      { type: 'radio',    name: 'q_followup', label: 'Please select an option.' },
+      // Q22 (q_contact) is optional
+    ],
+    7: [
+      { type: 'radio', name: 'rs_overall',  label: 'Please select a rating.' },
+      { type: 'text',  id: 'q_message',     label: 'Please write a message to the next cohort.' },
+      // Q25 (q_final) is optional
+    ],
+  };
+
   function buildDots() {
     const container = document.getElementById('sectionDots');
     container.innerHTML = '';
@@ -1262,7 +1343,71 @@
     buildDots();
   }
 
+  // Clear all error states in a section
+  function clearErrors(sectionEl) {
+    sectionEl.querySelectorAll('.q-card.error').forEach(c => c.classList.remove('error'));
+  }
+
+  // Find the q-card that wraps a given element
+  function cardOf(el) {
+    return el ? el.closest('.q-card') : null;
+  }
+
+  // Validate all required fields in the current section
+  // Returns true if valid, false + highlights errors if not
+  function validateSection(sectionNum) {
+    const sectionEl = document.getElementById('section-' + sectionNum);
+    clearErrors(sectionEl);
+    const fields = REQUIRED[sectionNum] || [];
+    let firstError = null;
+    let valid = true;
+
+    for (const field of fields) {
+      let passed = false;
+      let targetEl = null;
+
+      if (field.type === 'text') {
+        const el = document.getElementById(field.id);
+        passed = el && el.value.trim().length > 0;
+        targetEl = el;
+      } else if (field.type === 'radio') {
+        const checked = document.querySelector(`input[name="${field.name}"]:checked`);
+        passed = !!checked;
+        // Find any label in this group to locate the card
+        targetEl = document.querySelector(`input[name="${field.name}"]`);
+      } else if (field.type === 'checkbox') {
+        passed = field.ids.some(id => document.getElementById(id)?.checked);
+        targetEl = document.getElementById(field.ids[0]);
+      }
+
+      if (!passed) {
+        valid = false;
+        const card = cardOf(targetEl);
+        if (card) {
+          card.classList.add('error');
+          // Inject error message if not already there
+          if (!card.querySelector('.error-msg')) {
+            const msg = document.createElement('p');
+            msg.className = 'error-msg';
+            msg.textContent = '⚠ ' + field.label;
+            card.appendChild(msg);
+          }
+          if (!firstError) firstError = card;
+        }
+      }
+    }
+
+    if (firstError) {
+      firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return valid;
+  }
+
   function goTo(n) {
+    // If moving forward, validate current section first
+    if (n > currentSection) {
+      if (!validateSection(currentSection)) return;
+    }
     document.getElementById('section-' + currentSection).classList.remove('active');
     currentSection = n;
     const next = document.getElementById('section-' + currentSection);
@@ -1339,6 +1484,9 @@
   }
 
   async function submitSurvey() {
+    // Validate final section before submitting
+    if (!validateSection(7)) return;
+
     // Show loading state on button
     const btn = document.querySelector('#section-7 .btn-next');
     btn.textContent = 'Submitting…';

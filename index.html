@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -11,755 +12,758 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --navy: #0a0f1e;
-    --navy-mid: #111827;
-    --navy-card: #151d30;
-    --gold: #c9a84c;
-    --gold-light: #e8c96b;
-    --gold-pale: #f5e6c0;
-    --cream: #faf6ee;
-    --white: #ffffff;
-    --muted: #8b9bb4;
-    --border: rgba(201,168,76,0.2);
-    --success: #4ade80;
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--navy);
-    color: var(--cream);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* BACKGROUND */
-  .bg-texture {
-    position: fixed; inset: 0; z-index: 0;
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201,168,76,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 90% 80%, rgba(201,168,76,0.04) 0%, transparent 50%),
-      var(--navy);
-    pointer-events: none;
-  }
-
-  .bg-grid {
-    position: fixed; inset: 0; z-index: 0;
-    background-image:
-      linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    pointer-events: none;
-  }
-
-  /* LAYOUT */
-  .survey-wrap {
-    position: relative; z-index: 1;
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 0 24px 80px;
-  }
-
-  /* HEADER */
-  .survey-header {
-    padding: 60px 0 40px;
-    text-align: center;
-    animation: fadeDown 0.8s ease both;
-  }
-
-  .program-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(201,168,76,0.1);
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    padding: 6px 16px;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 24px;
-  }
-
-  .program-badge::before {
-    content: '';
-    width: 6px; height: 6px;
-    background: var(--gold);
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-
-  h1.survey-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(32px, 6vw, 52px);
-    font-weight: 900;
-    line-height: 1.1;
-    color: var(--white);
-    margin-bottom: 16px;
-  }
-
-  h1.survey-title span {
-    color: var(--gold);
-  }
-
-  .survey-subtitle {
-    font-size: 16px;
-    color: var(--muted);
-    max-width: 520px;
-    margin: 0 auto 32px;
-    line-height: 1.7;
-  }
-
-  /* PROGRESS */
-  .progress-bar-wrap {
-    background: rgba(255,255,255,0.06);
-    border-radius: 100px;
-    height: 4px;
-    margin-bottom: 12px;
-    overflow: hidden;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold), var(--gold-light));
-    border-radius: 100px;
-    transition: width 0.5s cubic-bezier(.4,0,.2,1);
-  }
-
-  .progress-label {
-    display: flex; justify-content: space-between;
-    font-size: 12px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    margin-bottom: 40px;
-  }
-
-  /* SECTION */
-  .section-block {
-    display: none;
-    animation: fadeUp 0.5s ease both;
-  }
-  .section-block.active { display: block; }
-
-  .section-eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 8px;
-  }
-
-  .section-heading {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(22px, 4vw, 30px);
-    font-weight: 700;
-    color: var(--white);
-    margin-bottom: 8px;
-    line-height: 1.25;
-  }
-
-  .section-desc {
-    font-size: 15px;
-    color: var(--muted);
-    margin-bottom: 36px;
-    line-height: 1.65;
-  }
-
-  /* QUESTION CARD */
-  .q-card {
-    background: var(--navy-card);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 16px;
-    padding: 28px 32px;
-    margin-bottom: 20px;
-    transition: border-color 0.3s;
-  }
-
-  .q-card:hover { border-color: var(--border); }
-
-  .q-label {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--cream);
-    margin-bottom: 18px;
-    line-height: 1.55;
-  }
-
-  .q-label .q-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--gold);
-    display: block;
-    margin-bottom: 6px;
-    letter-spacing: 0.08em;
-  }
-
-  /* RATING SCALE */
-  .rating-scale {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .rating-scale input[type="radio"] { display: none; }
-
-  .rating-scale label {
-    width: 44px; height: 44px;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.2s;
-    user-select: none;
-  }
-
-  .rating-scale label:hover {
-    background: rgba(201,168,76,0.1);
-    border-color: var(--gold);
-    color: var(--gold);
-  }
-
-  .rating-scale input[type="radio"]:checked + label {
-    background: var(--gold);
-    border-color: var(--gold);
-    color: var(--navy);
-    font-weight: 600;
-    transform: scale(1.08);
-  }
-
-  .scale-ends {
-    display: flex; justify-content: space-between;
-    font-size: 11px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    margin-top: 10px;
-    letter-spacing: 0.05em;
-  }
-
-  /* RADIO OPTIONS */
-  .radio-options { display: flex; flex-direction: column; gap: 10px; }
-
-  .radio-options input[type="radio"] { display: none; }
-
-  .radio-options label {
-    display: flex; align-items: center; gap: 14px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-size: 14px;
-    color: var(--cream);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .radio-options label::before {
-    content: '';
-    width: 18px; height: 18px; min-width: 18px;
-    border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.2);
-    transition: all 0.2s;
-  }
-
-  .radio-options label:hover {
-    border-color: var(--border);
-    background: rgba(201,168,76,0.06);
-  }
-
-  .radio-options input[type="radio"]:checked + label {
-    border-color: var(--gold);
-    background: rgba(201,168,76,0.1);
-    color: var(--gold-pale);
-  }
-
-  .radio-options input[type="radio"]:checked + label::before {
-    background: var(--gold);
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(201,168,76,0.2);
-  }
-
-  /* CHECKBOX OPTIONS */
-  .checkbox-options { display: flex; flex-direction: column; gap: 10px; }
-  .checkbox-options input[type="checkbox"] { display: none; }
-
-  .checkbox-options label {
-    display: flex; align-items: center; gap: 14px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-size: 14px;
-    color: var(--cream);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .checkbox-options label::before {
-    content: '';
-    width: 18px; height: 18px; min-width: 18px;
-    border-radius: 5px;
-    border: 2px solid rgba(255,255,255,0.2);
-    transition: all 0.2s;
-  }
-
-  .checkbox-options label:hover { border-color: var(--border); background: rgba(201,168,76,0.06); }
-
-  .checkbox-options input[type="checkbox"]:checked + label {
-    border-color: var(--gold);
-    background: rgba(201,168,76,0.1);
-    color: var(--gold-pale);
-  }
-
-  .checkbox-options input[type="checkbox"]:checked + label::before {
-    background: var(--gold);
-    border-color: var(--gold);
-    content: '✓';
-    color: var(--navy);
-    font-size: 12px;
-    font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  /* TEXTAREA */
-  .survey-textarea {
-    width: 100%;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 16px 20px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--cream);
-    resize: vertical;
-    min-height: 110px;
-    transition: border-color 0.3s;
-    outline: none;
-  }
-
-  .survey-textarea::placeholder { color: rgba(139,155,180,0.5); }
-  .survey-textarea:focus { border-color: var(--gold); background: rgba(201,168,76,0.04); }
-
-  /* TEXT INPUT */
-  .survey-input {
-    width: 100%;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 14px 20px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--cream);
-    outline: none;
-    transition: border-color 0.3s;
-  }
-
-  .survey-input::placeholder { color: rgba(139,155,180,0.5); }
-  .survey-input:focus { border-color: var(--gold); background: rgba(201,168,76,0.04); }
-
-  /* ID CAPITAL GRID */
-  .ic-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-
-  @media (max-width: 560px) { .ic-grid { grid-template-columns: 1fr; } }
-
-  .ic-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 14px;
-    padding: 20px;
-    transition: border-color 0.3s;
-  }
-
-  .ic-card:hover { border-color: var(--border); }
-
-  .ic-name {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 6px;
-  }
-
-  .ic-desc {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 14px;
-    line-height: 1.5;
-  }
-
-  .ic-stars { display: flex; gap: 6px; }
-  .ic-stars input[type="radio"] { display: none; }
-
-  .ic-stars label {
-    font-size: 20px;
-    cursor: pointer;
-    opacity: 0.25;
-    transition: opacity 0.15s, transform 0.15s;
-    user-select: none;
-  }
-
-  .ic-stars label:hover,
-  .ic-stars input[type="radio"]:checked ~ label,
-  .ic-stars label:hover ~ label { opacity: 1; }
-
-  /* Reverse sibling trick for star rating */
-  .ic-stars { flex-direction: row-reverse; justify-content: flex-end; }
-  .ic-stars label:hover,
-  .ic-stars label:hover ~ label { opacity: 1; }
-  .ic-stars input[type="radio"]:checked + label,
-  .ic-stars input[type="radio"]:checked + label ~ label { opacity: 1; }
-
-  /* NAVIGATION */
-  .nav-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 40px;
-    gap: 16px;
-  }
-
-  .btn-back {
-    display: flex; align-items: center; gap: 8px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 100px;
-    padding: 12px 24px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .btn-back:hover { border-color: rgba(255,255,255,0.3); color: var(--cream); }
-
-  .btn-next {
-    display: flex; align-items: center; gap: 10px;
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    border: none;
-    border-radius: 100px;
-    padding: 14px 32px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--navy);
-    cursor: pointer;
-    transition: all 0.25s;
-    box-shadow: 0 4px 24px rgba(201,168,76,0.25);
-  }
-
-  .btn-next:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(201,168,76,0.35);
-  }
-
-  .btn-next:active { transform: translateY(0); }
-
-  /* DIVIDER */
-  .divider {
-    border: none;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    margin: 32px 0;
-  }
-
-  /* THANK YOU STATE */
-  .thank-you {
-    display: none;
-    text-align: center;
-    padding: 80px 0;
-    animation: fadeUp 0.7s ease both;
-  }
-
-  .thank-you.active { display: block; }
-
-  .ty-icon {
-    width: 80px; height: 80px;
-    background: rgba(201,168,76,0.1);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 36px;
-    margin: 0 auto 32px;
-    animation: pop 0.5s cubic-bezier(.34,1.56,.64,1) 0.3s both;
-  }
-
-  .ty-heading {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(28px, 5vw, 44px);
-    font-weight: 900;
-    color: var(--white);
-    margin-bottom: 16px;
-  }
-
-  .ty-heading span { color: var(--gold); }
-
-  .ty-body {
-    font-size: 16px;
-    color: var(--muted);
-    line-height: 1.75;
-    max-width: 480px;
-    margin: 0 auto 40px;
-  }
-
-  .ty-stats {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    flex-wrap: wrap;
-    padding: 32px;
-    background: var(--navy-card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    margin: 0 auto;
-    max-width: 480px;
-  }
-
-  .ty-stat { text-align: center; }
-
-  .ty-stat-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 36px;
-    font-weight: 900;
-    color: var(--gold);
-    display: block;
-  }
-
-  .ty-stat-label {
-    font-size: 12px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* ANIMATIONS */
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  @keyframes pop {
-    from { opacity: 0; transform: scale(0.5); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  /* CALLOUT BOX */
-  .callout {
-    background: rgba(201,168,76,0.06);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--gold);
-    border-radius: 0 12px 12px 0;
-    padding: 16px 20px;
-    margin-bottom: 24px;
-    font-size: 14px;
-    color: var(--gold-pale);
-    line-height: 1.6;
-  }
-
-  /* SELECT */
-  .survey-select {
-    width: 100%;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 14px 20px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--cream);
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b9bb4' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    transition: border-color 0.3s;
-  }
-
-  .survey-select:focus { border-color: var(--gold); }
-  .survey-select option { background: var(--navy-mid); color: var(--cream); }
-
-  /* SECTION INDICATOR DOTS */
-  .section-dots {
-    display: flex; justify-content: center; gap: 8px;
-    margin-bottom: 32px;
-  }
-
-  .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    transition: all 0.3s;
-  }
-
-  .dot.done { background: var(--gold); opacity: 0.5; }
-  .dot.current { background: var(--gold); width: 24px; border-radius: 100px; }
-
-  .char-count {
-    text-align: right;
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    color: var(--muted);
-    margin-top: 6px;
-  }
-
-
-  /* ── VALIDATION ERROR STATES ─────────────────────────── */
-  .q-card.error {
-    border-color: #f87171 !important;
-    animation: shake 0.35s ease;
-  }
-
-  .error-msg {
-    display: none;
-    font-size: 12px;
-    color: #f87171;
-    font-family: 'DM Mono', monospace;
-    margin-top: 10px;
-    letter-spacing: 0.05em;
-  }
-
-  .q-card.error .error-msg { display: block; }
-
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    20%      { transform: translateX(-6px); }
-    40%      { transform: translateX(6px); }
-    60%      { transform: translateX(-4px); }
-    80%      { transform: translateX(4px); }
-  }
-  /* ── MOBILE OPTIMIZATIONS ─────────────────────────────── */
-  @media (max-width: 600px) {
-
-    /* Layout */
-    .survey-wrap { padding: 0 16px 100px; }
-
-    /* Header */
-    .survey-header { padding: 36px 0 28px; }
-    .program-badge { font-size: 10px; padding: 5px 12px; }
-    .survey-subtitle { font-size: 15px; }
-
-    /* Progress */
-    .progress-label { font-size: 11px; }
-
-    /* Section */
-    .section-desc { font-size: 14px; margin-bottom: 24px; }
-
-    /* Question cards — less padding on small screens */
-    .q-card { padding: 20px 18px; margin-bottom: 14px; border-radius: 12px; }
-    .q-label { font-size: 14px; margin-bottom: 14px; }
-
-    /* Rating scale — bigger touch targets, wrap naturally */
-    .rating-scale { gap: 6px; }
-    .rating-scale label {
-      width: 48px; height: 48px;
-      font-size: 15px;
-      border-radius: 10px;
-      /* Prevent double-tap zoom on iOS */
-      touch-action: manipulation;
-    }
-    .scale-ends { font-size: 10px; }
-
-    /* Radio & checkbox — larger tap area */
-    .radio-options label,
-    .checkbox-options label {
-      padding: 14px 14px;
-      font-size: 13px;
-      gap: 12px;
-      touch-action: manipulation;
-      /* Ensure full-width tap target */
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .radio-options label::before,
-    .checkbox-options label::before {
-      width: 20px; height: 20px; min-width: 20px;
-    }
-
-    /* Stars — bigger on mobile */
-    .ic-stars label { font-size: 26px; }
-    .ic-card { padding: 16px; }
-    .ic-desc { font-size: 12px; }
-
-    /* Textarea — prevent iOS zoom (font-size must be >= 16px) */
-    .survey-textarea {
-      font-size: 16px;
-      padding: 14px 16px;
-      min-height: 100px;
-    }
-
-    /* Text inputs — prevent iOS zoom */
-    .survey-input,
-    .survey-select {
-      font-size: 16px;
-      padding: 14px 16px;
-    }
-
-    /* Callout */
-    .callout { font-size: 13px; padding: 14px 16px; }
-
-    /* Navigation buttons — full width stack on very small screens */
-    .nav-row {
-      flex-direction: column-reverse;
-      gap: 10px;
-      margin-top: 28px;
-    }
-
-    .btn-next {
-      width: 100%;
-      justify-content: center;
-      padding: 16px 24px;
-      font-size: 15px;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .btn-back {
-      width: 100%;
-      justify-content: center;
-      padding: 13px 24px;
-      touch-action: manipulation;
-    }
-
-    /* Thank you */
-    .thank-you { padding: 48px 0; }
-    .ty-stats { gap: 24px; padding: 24px 16px; }
-    .ty-stat-num { font-size: 28px; }
-    .ty-body { font-size: 15px; }
-  }
-
-  /* Mid-range tablets */
-  @media (min-width: 601px) and (max-width: 768px) {
-    .survey-wrap { padding: 0 32px 80px; }
-    .q-card { padding: 24px 24px; }
-    .rating-scale label { width: 46px; height: 46px; }
-    .survey-textarea,
-    .survey-input { font-size: 16px; }
-    .nav-row { gap: 12px; }
-    .btn-next { padding: 14px 28px; }
-  }
+:root {
+–navy: #0a0f1e;
+–navy-mid: #111827;
+–navy-card: #151d30;
+–gold: #c9a84c;
+–gold-light: #e8c96b;
+–gold-pale: #f5e6c0;
+–cream: #faf6ee;
+–white: #ffffff;
+–muted: #8b9bb4;
+–border: rgba(201,168,76,0.2);
+–success: #4ade80;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+font-family: ‘DM Sans’, sans-serif;
+background: var(–navy);
+color: var(–cream);
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* BACKGROUND */
+.bg-texture {
+position: fixed; inset: 0; z-index: 0;
+background:
+radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201,168,76,0.08) 0%, transparent 60%),
+radial-gradient(ellipse 60% 40% at 90% 80%, rgba(201,168,76,0.04) 0%, transparent 50%),
+var(–navy);
+pointer-events: none;
+}
+
+.bg-grid {
+position: fixed; inset: 0; z-index: 0;
+background-image:
+linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+background-size: 60px 60px;
+pointer-events: none;
+}
+
+/* LAYOUT */
+.survey-wrap {
+position: relative; z-index: 1;
+max-width: 760px;
+margin: 0 auto;
+padding: 0 24px 80px;
+}
+
+/* HEADER */
+.survey-header {
+padding: 60px 0 40px;
+text-align: center;
+animation: fadeDown 0.8s ease both;
+}
+
+.program-badge {
+display: inline-flex; align-items: center; gap: 8px;
+background: rgba(201,168,76,0.1);
+border: 1px solid var(–border);
+border-radius: 100px;
+padding: 6px 16px;
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.12em;
+color: var(–gold);
+text-transform: uppercase;
+margin-bottom: 24px;
+}
+
+.program-badge::before {
+content: ‘’;
+width: 6px; height: 6px;
+background: var(–gold);
+border-radius: 50%;
+animation: pulse 2s infinite;
+}
+
+h1.survey-title {
+font-family: ‘Playfair Display’, serif;
+font-size: clamp(32px, 6vw, 52px);
+font-weight: 900;
+line-height: 1.1;
+color: var(–white);
+margin-bottom: 16px;
+}
+
+h1.survey-title span {
+color: var(–gold);
+}
+
+.survey-subtitle {
+font-size: 16px;
+color: var(–muted);
+max-width: 520px;
+margin: 0 auto 32px;
+line-height: 1.7;
+}
+
+/* PROGRESS */
+.progress-bar-wrap {
+background: rgba(255,255,255,0.06);
+border-radius: 100px;
+height: 4px;
+margin-bottom: 12px;
+overflow: hidden;
+}
+
+.progress-bar-fill {
+height: 100%;
+background: linear-gradient(90deg, var(–gold), var(–gold-light));
+border-radius: 100px;
+transition: width 0.5s cubic-bezier(.4,0,.2,1);
+}
+
+.progress-label {
+display: flex; justify-content: space-between;
+font-size: 12px;
+color: var(–muted);
+font-family: ‘DM Mono’, monospace;
+margin-bottom: 40px;
+}
+
+/* SECTION */
+.section-block {
+display: none;
+animation: fadeUp 0.5s ease both;
+}
+.section-block.active { display: block; }
+
+.section-eyebrow {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: var(–gold);
+margin-bottom: 8px;
+}
+
+.section-heading {
+font-family: ‘Playfair Display’, serif;
+font-size: clamp(22px, 4vw, 30px);
+font-weight: 700;
+color: var(–white);
+margin-bottom: 8px;
+line-height: 1.25;
+}
+
+.section-desc {
+font-size: 15px;
+color: var(–muted);
+margin-bottom: 36px;
+line-height: 1.65;
+}
+
+/* QUESTION CARD */
+.q-card {
+background: var(–navy-card);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 16px;
+padding: 28px 32px;
+margin-bottom: 20px;
+transition: border-color 0.3s;
+}
+
+.q-card:hover { border-color: var(–border); }
+
+.q-label {
+font-size: 15px;
+font-weight: 500;
+color: var(–cream);
+margin-bottom: 18px;
+line-height: 1.55;
+}
+
+.q-label .q-num {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: var(–gold);
+display: block;
+margin-bottom: 6px;
+letter-spacing: 0.08em;
+}
+
+/* RATING SCALE */
+.rating-scale {
+display: flex;
+gap: 8px;
+flex-wrap: wrap;
+}
+
+.rating-scale input[type=“radio”] { display: none; }
+
+.rating-scale label {
+width: 44px; height: 44px;
+display: flex; align-items: center; justify-content: center;
+background: rgba(255,255,255,0.04);
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 10px;
+font-family: ‘DM Mono’, monospace;
+font-size: 14px;
+color: var(–muted);
+cursor: pointer;
+transition: all 0.2s;
+user-select: none;
+}
+
+.rating-scale label:hover {
+background: rgba(201,168,76,0.1);
+border-color: var(–gold);
+color: var(–gold);
+}
+
+.rating-scale input[type=“radio”]:checked + label {
+background: var(–gold);
+border-color: var(–gold);
+color: var(–navy);
+font-weight: 600;
+transform: scale(1.08);
+}
+
+.scale-ends {
+display: flex; justify-content: space-between;
+font-size: 11px;
+color: var(–muted);
+font-family: ‘DM Mono’, monospace;
+margin-top: 10px;
+letter-spacing: 0.05em;
+}
+
+/* RADIO OPTIONS */
+.radio-options { display: flex; flex-direction: column; gap: 10px; }
+
+.radio-options input[type=“radio”] { display: none; }
+
+.radio-options label {
+display: flex; align-items: center; gap: 14px;
+background: rgba(255,255,255,0.03);
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 12px;
+padding: 14px 18px;
+font-size: 14px;
+color: var(–cream);
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.radio-options label::before {
+content: ‘’;
+width: 18px; height: 18px; min-width: 18px;
+border-radius: 50%;
+border: 2px solid rgba(255,255,255,0.2);
+transition: all 0.2s;
+}
+
+.radio-options label:hover {
+border-color: var(–border);
+background: rgba(201,168,76,0.06);
+}
+
+.radio-options input[type=“radio”]:checked + label {
+border-color: var(–gold);
+background: rgba(201,168,76,0.1);
+color: var(–gold-pale);
+}
+
+.radio-options input[type=“radio”]:checked + label::before {
+background: var(–gold);
+border-color: var(–gold);
+box-shadow: 0 0 0 3px rgba(201,168,76,0.2);
+}
+
+/* CHECKBOX OPTIONS */
+.checkbox-options { display: flex; flex-direction: column; gap: 10px; }
+.checkbox-options input[type=“checkbox”] { display: none; }
+
+.checkbox-options label {
+display: flex; align-items: center; gap: 14px;
+background: rgba(255,255,255,0.03);
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 12px;
+padding: 14px 18px;
+font-size: 14px;
+color: var(–cream);
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.checkbox-options label::before {
+content: ‘’;
+width: 18px; height: 18px; min-width: 18px;
+border-radius: 5px;
+border: 2px solid rgba(255,255,255,0.2);
+transition: all 0.2s;
+}
+
+.checkbox-options label:hover { border-color: var(–border); background: rgba(201,168,76,0.06); }
+
+.checkbox-options input[type=“checkbox”]:checked + label {
+border-color: var(–gold);
+background: rgba(201,168,76,0.1);
+color: var(–gold-pale);
+}
+
+.checkbox-options input[type=“checkbox”]:checked + label::before {
+background: var(–gold);
+border-color: var(–gold);
+content: ‘✓’;
+color: var(–navy);
+font-size: 12px;
+font-weight: 700;
+display: flex; align-items: center; justify-content: center;
+}
+
+/* TEXTAREA */
+.survey-textarea {
+width: 100%;
+background: rgba(255,255,255,0.04);
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 12px;
+padding: 16px 20px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+color: var(–cream);
+resize: vertical;
+min-height: 110px;
+transition: border-color 0.3s;
+outline: none;
+}
+
+.survey-textarea::placeholder { color: rgba(139,155,180,0.5); }
+.survey-textarea:focus { border-color: var(–gold); background: rgba(201,168,76,0.04); }
+
+/* TEXT INPUT */
+.survey-input {
+width: 100%;
+background: rgba(255,255,255,0.04);
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 12px;
+padding: 14px 20px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+color: var(–cream);
+outline: none;
+transition: border-color 0.3s;
+}
+
+.survey-input::placeholder { color: rgba(139,155,180,0.5); }
+.survey-input:focus { border-color: var(–gold); background: rgba(201,168,76,0.04); }
+
+/* ID CAPITAL GRID */
+.ic-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 14px;
+}
+
+@media (max-width: 560px) { .ic-grid { grid-template-columns: 1fr; } }
+
+.ic-card {
+background: rgba(255,255,255,0.03);
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 14px;
+padding: 20px;
+transition: border-color 0.3s;
+}
+
+.ic-card:hover { border-color: var(–border); }
+
+.ic-name {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.12em;
+text-transform: uppercase;
+color: var(–gold);
+margin-bottom: 6px;
+}
+
+.ic-desc {
+font-size: 12px;
+color: var(–muted);
+margin-bottom: 14px;
+line-height: 1.5;
+}
+
+.ic-stars { display: flex; gap: 6px; }
+.ic-stars input[type=“radio”] { display: none; }
+
+.ic-stars label {
+font-size: 20px;
+cursor: pointer;
+opacity: 0.25;
+transition: opacity 0.15s, transform 0.15s;
+user-select: none;
+}
+
+.ic-stars label:hover,
+.ic-stars input[type=“radio”]:checked ~ label,
+.ic-stars label:hover ~ label { opacity: 1; }
+
+/* Reverse sibling trick for star rating */
+.ic-stars { flex-direction: row-reverse; justify-content: flex-end; }
+.ic-stars label:hover,
+.ic-stars label:hover ~ label { opacity: 1; }
+.ic-stars input[type=“radio”]:checked + label,
+.ic-stars input[type=“radio”]:checked + label ~ label { opacity: 1; }
+
+/* NAVIGATION */
+.nav-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-top: 40px;
+gap: 16px;
+}
+
+.btn-back {
+display: flex; align-items: center; gap: 8px;
+background: transparent;
+border: 1px solid rgba(255,255,255,0.12);
+border-radius: 100px;
+padding: 12px 24px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+font-weight: 500;
+color: var(–muted);
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.btn-back:hover { border-color: rgba(255,255,255,0.3); color: var(–cream); }
+
+.btn-next {
+display: flex; align-items: center; gap: 10px;
+background: linear-gradient(135deg, var(–gold), var(–gold-light));
+border: none;
+border-radius: 100px;
+padding: 14px 32px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 15px;
+font-weight: 600;
+color: var(–navy);
+cursor: pointer;
+transition: all 0.25s;
+box-shadow: 0 4px 24px rgba(201,168,76,0.25);
+}
+
+.btn-next:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 32px rgba(201,168,76,0.35);
+}
+
+.btn-next:active { transform: translateY(0); }
+
+/* DIVIDER */
+.divider {
+border: none;
+border-top: 1px solid rgba(255,255,255,0.06);
+margin: 32px 0;
+}
+
+/* THANK YOU STATE */
+.thank-you {
+display: none;
+text-align: center;
+padding: 80px 0;
+animation: fadeUp 0.7s ease both;
+}
+
+.thank-you.active { display: block; }
+
+.ty-icon {
+width: 80px; height: 80px;
+background: rgba(201,168,76,0.1);
+border: 1px solid var(–border);
+border-radius: 50%;
+display: flex; align-items: center; justify-content: center;
+font-size: 36px;
+margin: 0 auto 32px;
+animation: pop 0.5s cubic-bezier(.34,1.56,.64,1) 0.3s both;
+}
+
+.ty-heading {
+font-family: ‘Playfair Display’, serif;
+font-size: clamp(28px, 5vw, 44px);
+font-weight: 900;
+color: var(–white);
+margin-bottom: 16px;
+}
+
+.ty-heading span { color: var(–gold); }
+
+.ty-body {
+font-size: 16px;
+color: var(–muted);
+line-height: 1.75;
+max-width: 480px;
+margin: 0 auto 40px;
+}
+
+.ty-stats {
+display: flex;
+justify-content: center;
+gap: 40px;
+flex-wrap: wrap;
+padding: 32px;
+background: var(–navy-card);
+border: 1px solid var(–border);
+border-radius: 20px;
+margin: 0 auto;
+max-width: 480px;
+}
+
+.ty-stat { text-align: center; }
+
+.ty-stat-num {
+font-family: ‘Playfair Display’, serif;
+font-size: 36px;
+font-weight: 900;
+color: var(–gold);
+display: block;
+}
+
+.ty-stat-label {
+font-size: 12px;
+color: var(–muted);
+text-transform: uppercase;
+letter-spacing: 0.08em;
+font-family: ‘DM Mono’, monospace;
+}
+
+/* ANIMATIONS */
+@keyframes fadeDown {
+from { opacity: 0; transform: translateY(-20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.3; }
+}
+
+@keyframes pop {
+from { opacity: 0; transform: scale(0.5); }
+to { opacity: 1; transform: scale(1); }
+}
+
+/* CALLOUT BOX */
+.callout {
+background: rgba(201,168,76,0.06);
+border: 1px solid var(–border);
+border-left: 3px solid var(–gold);
+border-radius: 0 12px 12px 0;
+padding: 16px 20px;
+margin-bottom: 24px;
+font-size: 14px;
+color: var(–gold-pale);
+line-height: 1.6;
+}
+
+/* SELECT */
+.survey-select {
+width: 100%;
+background: rgba(255,255,255,0.04);
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 12px;
+padding: 14px 20px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+color: var(–cream);
+outline: none;
+cursor: pointer;
+appearance: none;
+background-image: url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘12’ height=‘8’ fill=‘none’%3E%3Cpath d=‘M1 1l5 5 5-5’ stroke=’%238b9bb4’ stroke-width=‘2’ stroke-linecap=‘round’/%3E%3C/svg%3E”);
+background-repeat: no-repeat;
+background-position: right 16px center;
+transition: border-color 0.3s;
+}
+
+.survey-select:focus { border-color: var(–gold); }
+.survey-select option { background: var(–navy-mid); color: var(–cream); }
+
+/* SECTION INDICATOR DOTS */
+.section-dots {
+display: flex; justify-content: center; gap: 8px;
+margin-bottom: 32px;
+}
+
+.dot {
+width: 8px; height: 8px;
+border-radius: 50%;
+background: rgba(255,255,255,0.1);
+transition: all 0.3s;
+}
+
+.dot.done { background: var(–gold); opacity: 0.5; }
+.dot.current { background: var(–gold); width: 24px; border-radius: 100px; }
+
+.char-count {
+text-align: right;
+font-size: 11px;
+font-family: ‘DM Mono’, monospace;
+color: var(–muted);
+margin-top: 6px;
+}
+
+/* ── VALIDATION ERROR STATES ─────────────────────────── */
+.q-card.error {
+border-color: #f87171 !important;
+animation: shake 0.35s ease;
+}
+
+.error-msg {
+display: none;
+font-size: 12px;
+color: #f87171;
+font-family: ‘DM Mono’, monospace;
+margin-top: 10px;
+letter-spacing: 0.05em;
+}
+
+.q-card.error .error-msg { display: block; }
+
+@keyframes shake {
+0%,100% { transform: translateX(0); }
+20%      { transform: translateX(-6px); }
+40%      { transform: translateX(6px); }
+60%      { transform: translateX(-4px); }
+80%      { transform: translateX(4px); }
+}
+/* ── MOBILE OPTIMIZATIONS ─────────────────────────────── */
+@media (max-width: 600px) {
+
+```
+/* Layout */
+.survey-wrap { padding: 0 16px 100px; }
+
+/* Header */
+.survey-header { padding: 36px 0 28px; }
+.program-badge { font-size: 10px; padding: 5px 12px; }
+.survey-subtitle { font-size: 15px; }
+
+/* Progress */
+.progress-label { font-size: 11px; }
+
+/* Section */
+.section-desc { font-size: 14px; margin-bottom: 24px; }
+
+/* Question cards — less padding on small screens */
+.q-card { padding: 20px 18px; margin-bottom: 14px; border-radius: 12px; }
+.q-label { font-size: 14px; margin-bottom: 14px; }
+
+/* Rating scale — bigger touch targets, wrap naturally */
+.rating-scale { gap: 6px; }
+.rating-scale label {
+  width: 48px; height: 48px;
+  font-size: 15px;
+  border-radius: 10px;
+  /* Prevent double-tap zoom on iOS */
+  touch-action: manipulation;
+}
+.scale-ends { font-size: 10px; }
+
+/* Radio & checkbox — larger tap area */
+.radio-options label,
+.checkbox-options label {
+  padding: 14px 14px;
+  font-size: 13px;
+  gap: 12px;
+  touch-action: manipulation;
+  /* Ensure full-width tap target */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.radio-options label::before,
+.checkbox-options label::before {
+  width: 20px; height: 20px; min-width: 20px;
+}
+
+/* Stars — bigger on mobile */
+.ic-stars label { font-size: 26px; }
+.ic-card { padding: 16px; }
+.ic-desc { font-size: 12px; }
+
+/* Textarea — prevent iOS zoom (font-size must be >= 16px) */
+.survey-textarea {
+  font-size: 16px;
+  padding: 14px 16px;
+  min-height: 100px;
+}
+
+/* Text inputs — prevent iOS zoom */
+.survey-input,
+.survey-select {
+  font-size: 16px;
+  padding: 14px 16px;
+}
+
+/* Callout */
+.callout { font-size: 13px; padding: 14px 16px; }
+
+/* Navigation buttons — full width stack on very small screens */
+.nav-row {
+  flex-direction: column-reverse;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.btn-next {
+  width: 100%;
+  justify-content: center;
+  padding: 16px 24px;
+  font-size: 15px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-back {
+  width: 100%;
+  justify-content: center;
+  padding: 13px 24px;
+  touch-action: manipulation;
+}
+
+/* Thank you */
+.thank-you { padding: 48px 0; }
+.ty-stats { gap: 24px; padding: 24px 16px; }
+.ty-stat-num { font-size: 28px; }
+.ty-body { font-size: 15px; }
+```
+
+}
+
+/* Mid-range tablets */
+@media (min-width: 601px) and (max-width: 768px) {
+.survey-wrap { padding: 0 32px 80px; }
+.q-card { padding: 24px 24px; }
+.rating-scale label { width: 46px; height: 46px; }
+.survey-textarea,
+.survey-input { font-size: 16px; }
+.nav-row { gap: 12px; }
+.btn-next { padding: 14px 28px; }
+}
 </style>
+
 </head>
 <body>
 <div class="bg-texture"></div>
@@ -768,6 +772,7 @@
 <div class="survey-wrap">
 
   <!-- HEADER -->
+
   <header class="survey-header">
     <div class="program-badge">McClain Foundation · NextGen Success Program</div>
     <h1 class="survey-title">Your Voice.<br><span>Your Legacy.</span></h1>
@@ -775,6 +780,7 @@
   </header>
 
   <!-- PROGRESS -->
+
   <div class="progress-bar-wrap">
     <div class="progress-bar-fill" id="progressFill" style="width: 14%"></div>
   </div>
@@ -784,465 +790,495 @@
   </div>
 
   <!-- SECTION DOTS -->
+
   <div class="section-dots" id="sectionDots"></div>
 
   <!-- ======================== SECTION 1: ABOUT YOU ======================== -->
+
   <div class="section-block active" id="section-1">
     <div class="section-eyebrow">Section 01 — Participant Info</div>
     <h2 class="section-heading">Let's start with you.</h2>
     <p class="section-desc">This information helps us track program outcomes and plan future cohorts. All responses are kept confidential.</p>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q1</span>What's your first name? (or the name you go by)</div>
-      <input type="text" class="survey-input" id="q_name" placeholder="Your name here…">
-    </div>
+```
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q1</span>What's your first name? (or the name you go by)</div>
+  <input type="text" class="survey-input" id="q_name" placeholder="Your name here…">
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q2</span>What age group best describes you?</div>
-      <div class="radio-options">
-        <input type="radio" name="q_age" id="age0" value="14-15"><label for="age0">14–15</label>
-        <input type="radio" name="q_age" id="age1" value="16-17"><label for="age1">16–17</label>
-        <input type="radio" name="q_age" id="age2" value="18-20"><label for="age2">18–20</label>
-        <input type="radio" name="q_age" id="age3" value="21-24"><label for="age3">21–24</label>
-      </div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q2</span>What age group best describes you?</div>
+  <div class="radio-options">
+    <input type="radio" name="q_age" id="age0" value="14-15"><label for="age0">14–15</label>
+    <input type="radio" name="q_age" id="age1" value="16-17"><label for="age1">16–17</label>
+    <input type="radio" name="q_age" id="age2" value="18-20"><label for="age2">18–20</label>
+    <input type="radio" name="q_age" id="age3" value="21-24"><label for="age3">21–24</label>
+  </div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q3</span>Where are you from in Philly? (neighborhood or area)</div>
-      <input type="text" class="survey-input" id="q_neighborhood" placeholder="e.g., West Philly, North Philly, Kensington…">
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q3</span>Where are you from in Philly? (neighborhood or area)</div>
+  <input type="text" class="survey-input" id="q_neighborhood" placeholder="e.g., West Philly, North Philly, Kensington…">
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q4</span>What was your status when you started the program?</div>
-      <div class="checkbox-options">
-        <input type="checkbox" id="s1" value="In school"><label for="s1">In school (high school or college)</label>
-        <input type="checkbox" id="s2" value="Working"><label for="s2">Working (full-time or part-time)</label>
-        <input type="checkbox" id="s3" value="Job seeking"><label for="s3">Looking for work</label>
-        <input type="checkbox" id="s4" value="Disconnected"><label for="s4">Not in school or work</label>
-        <input type="checkbox" id="s5" value="Caring for family"><label for="s5">Caring for family / children</label>
-      </div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q4</span>What was your status when you started the program?</div>
+  <div class="checkbox-options">
+    <input type="checkbox" id="s1" value="In school"><label for="s1">In school (high school or college)</label>
+    <input type="checkbox" id="s2" value="Working"><label for="s2">Working (full-time or part-time)</label>
+    <input type="checkbox" id="s3" value="Job seeking"><label for="s3">Looking for work</label>
+    <input type="checkbox" id="s4" value="Disconnected"><label for="s4">Not in school or work</label>
+    <input type="checkbox" id="s5" value="Caring for family"><label for="s5">Caring for family / children</label>
+  </div>
+</div>
 
-    <div class="nav-row">
-      <div></div>
-      <button class="btn-next" onclick="goTo(2)">Next — Program Experience →</button>
-    </div>
+<div class="nav-row">
+  <div></div>
+  <button class="btn-next" onclick="goTo(2)">Next — Program Experience →</button>
+</div>
+```
+
   </div>
 
   <!-- ======================== SECTION 2: PROGRAM EXPERIENCE ======================== -->
+
   <div class="section-block" id="section-2">
     <div class="section-eyebrow">Section 02 — Program Experience</div>
     <h2 class="section-heading">How was the experience?</h2>
     <p class="section-desc">Rate each area honestly. Your real feedback is how we improve — no wrong answers.</p>
 
-    <div class="callout">On a scale of 1–5: <strong>1 = Not at all / Needs major work</strong> &nbsp;·&nbsp; <strong>5 = Absolutely / Outstanding</strong></div>
+```
+<div class="callout">On a scale of 1–5: <strong>1 = Not at all / Needs major work</strong> &nbsp;·&nbsp; <strong>5 = Absolutely / Outstanding</strong></div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q5</span>The program felt relevant to my real life and what I'm actually dealing with.</div>
-      <div class="rating-scale" id="rs1">
-        <input type="radio" name="rs1" id="rs1_1" value="1"><label for="rs1_1">1</label>
-        <input type="radio" name="rs1" id="rs1_2" value="2"><label for="rs1_2">2</label>
-        <input type="radio" name="rs1" id="rs1_3" value="3"><label for="rs1_3">3</label>
-        <input type="radio" name="rs1" id="rs1_4" value="4"><label for="rs1_4">4</label>
-        <input type="radio" name="rs1" id="rs1_5" value="5"><label for="rs1_5">5</label>
-      </div>
-      <div class="scale-ends"><span>Not relevant</span><span>Completely relevant</span></div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q5</span>The program felt relevant to my real life and what I'm actually dealing with.</div>
+  <div class="rating-scale" id="rs1">
+    <input type="radio" name="rs1" id="rs1_1" value="1"><label for="rs1_1">1</label>
+    <input type="radio" name="rs1" id="rs1_2" value="2"><label for="rs1_2">2</label>
+    <input type="radio" name="rs1" id="rs1_3" value="3"><label for="rs1_3">3</label>
+    <input type="radio" name="rs1" id="rs1_4" value="4"><label for="rs1_4">4</label>
+    <input type="radio" name="rs1" id="rs1_5" value="5"><label for="rs1_5">5</label>
+  </div>
+  <div class="scale-ends"><span>Not relevant</span><span>Completely relevant</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q6</span>I felt safe and respected in this space — physically, emotionally, and socially.</div>
-      <div class="rating-scale">
-        <input type="radio" name="rs2" id="rs2_1" value="1"><label for="rs2_1">1</label>
-        <input type="radio" name="rs2" id="rs2_2" value="2"><label for="rs2_2">2</label>
-        <input type="radio" name="rs2" id="rs2_3" value="3"><label for="rs2_3">3</label>
-        <input type="radio" name="rs2" id="rs2_4" value="4"><label for="rs2_4">4</label>
-        <input type="radio" name="rs2" id="rs2_5" value="5"><label for="rs2_5">5</label>
-      </div>
-      <div class="scale-ends"><span>Did not feel safe</span><span>Completely safe</span></div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q6</span>I felt safe and respected in this space — physically, emotionally, and socially.</div>
+  <div class="rating-scale">
+    <input type="radio" name="rs2" id="rs2_1" value="1"><label for="rs2_1">1</label>
+    <input type="radio" name="rs2" id="rs2_2" value="2"><label for="rs2_2">2</label>
+    <input type="radio" name="rs2" id="rs2_3" value="3"><label for="rs2_3">3</label>
+    <input type="radio" name="rs2" id="rs2_4" value="4"><label for="rs2_4">4</label>
+    <input type="radio" name="rs2" id="rs2_5" value="5"><label for="rs2_5">5</label>
+  </div>
+  <div class="scale-ends"><span>Did not feel safe</span><span>Completely safe</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q7</span>The facilitators were consistent, fair, and showed up prepared every session.</div>
-      <div class="rating-scale">
-        <input type="radio" name="rs3" id="rs3_1" value="1"><label for="rs3_1">1</label>
-        <input type="radio" name="rs3" id="rs3_2" value="2"><label for="rs3_2">2</label>
-        <input type="radio" name="rs3" id="rs3_3" value="3"><label for="rs3_3">3</label>
-        <input type="radio" name="rs3" id="rs3_4" value="4"><label for="rs3_4">4</label>
-        <input type="radio" name="rs3" id="rs3_5" value="5"><label for="rs3_5">5</label>
-      </div>
-      <div class="scale-ends"><span>Inconsistent</span><span>Fully consistent</span></div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q7</span>The facilitators were consistent, fair, and showed up prepared every session.</div>
+  <div class="rating-scale">
+    <input type="radio" name="rs3" id="rs3_1" value="1"><label for="rs3_1">1</label>
+    <input type="radio" name="rs3" id="rs3_2" value="2"><label for="rs3_2">2</label>
+    <input type="radio" name="rs3" id="rs3_3" value="3"><label for="rs3_3">3</label>
+    <input type="radio" name="rs3" id="rs3_4" value="4"><label for="rs3_4">4</label>
+    <input type="radio" name="rs3" id="rs3_5" value="5"><label for="rs3_5">5</label>
+  </div>
+  <div class="scale-ends"><span>Inconsistent</span><span>Fully consistent</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q8</span>The workshops were engaging and I stayed focused during sessions.</div>
-      <div class="rating-scale">
-        <input type="radio" name="rs4" id="rs4_1" value="1"><label for="rs4_1">1</label>
-        <input type="radio" name="rs4" id="rs4_2" value="2"><label for="rs4_2">2</label>
-        <input type="radio" name="rs4" id="rs4_3" value="3"><label for="rs4_3">3</label>
-        <input type="radio" name="rs4" id="rs4_4" value="4"><label for="rs4_4">4</label>
-        <input type="radio" name="rs4" id="rs4_5" value="5"><label for="rs4_5">5</label>
-      </div>
-      <div class="scale-ends"><span>Disengaged</span><span>Fully locked in</span></div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q8</span>The workshops were engaging and I stayed focused during sessions.</div>
+  <div class="rating-scale">
+    <input type="radio" name="rs4" id="rs4_1" value="1"><label for="rs4_1">1</label>
+    <input type="radio" name="rs4" id="rs4_2" value="2"><label for="rs4_2">2</label>
+    <input type="radio" name="rs4" id="rs4_3" value="3"><label for="rs4_3">3</label>
+    <input type="radio" name="rs4" id="rs4_4" value="4"><label for="rs4_4">4</label>
+    <input type="radio" name="rs4" id="rs4_5" value="5"><label for="rs4_5">5</label>
+  </div>
+  <div class="scale-ends"><span>Disengaged</span><span>Fully locked in</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q9</span>I would recommend this program to someone I actually care about.</div>
-      <div class="rating-scale">
-        <input type="radio" name="rs5" id="rs5_1" value="1"><label for="rs5_1">1</label>
-        <input type="radio" name="rs5" id="rs5_2" value="2"><label for="rs5_2">2</label>
-        <input type="radio" name="rs5" id="rs5_3" value="3"><label for="rs5_3">3</label>
-        <input type="radio" name="rs5" id="rs5_4" value="4"><label for="rs5_4">4</label>
-        <input type="radio" name="rs5" id="rs5_5" value="5"><label for="rs5_5">5</label>
-      </div>
-      <div class="scale-ends"><span>No way</span><span>Absolutely</span></div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q9</span>I would recommend this program to someone I actually care about.</div>
+  <div class="rating-scale">
+    <input type="radio" name="rs5" id="rs5_1" value="1"><label for="rs5_1">1</label>
+    <input type="radio" name="rs5" id="rs5_2" value="2"><label for="rs5_2">2</label>
+    <input type="radio" name="rs5" id="rs5_3" value="3"><label for="rs5_3">3</label>
+    <input type="radio" name="rs5" id="rs5_4" value="4"><label for="rs5_4">4</label>
+    <input type="radio" name="rs5" id="rs5_5" value="5"><label for="rs5_5">5</label>
+  </div>
+  <div class="scale-ends"><span>No way</span><span>Absolutely</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q10</span>Which module hit different for you — which one stuck the most?</div>
-      <div class="radio-options">
-        <input type="radio" name="q_mod" id="mod1" value="Identity & Self-Mastery"><label for="mod1">Module 1 — Identity & Self-Mastery</label>
-        <input type="radio" name="q_mod" id="mod2" value="Emotional Intelligence"><label for="mod2">Module 2 — Emotional Intelligence & Regulation</label>
-        <input type="radio" name="q_mod" id="mod3" value="Communication"><label for="mod3">Module 3 — Communication Gamechangers</label>
-        <input type="radio" name="q_mod" id="mod4" value="Economic Power"><label for="mod4">Module 4 — Economic Power & Money Flow</label>
-        <input type="radio" name="q_mod" id="mod5" value="Career Readiness"><label for="mod5">Module 5 — Career Readiness & Leadership</label>
-        <input type="radio" name="q_mod" id="mod6" value="Community Impact"><label for="mod6">Module 6 — Community Impact Projects</label>
-      </div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q10</span>Which module hit different for you — which one stuck the most?</div>
+  <div class="radio-options">
+    <input type="radio" name="q_mod" id="mod1" value="Identity & Self-Mastery"><label for="mod1">Module 1 — Identity & Self-Mastery</label>
+    <input type="radio" name="q_mod" id="mod2" value="Emotional Intelligence"><label for="mod2">Module 2 — Emotional Intelligence & Regulation</label>
+    <input type="radio" name="q_mod" id="mod3" value="Communication"><label for="mod3">Module 3 — Communication Gamechangers</label>
+    <input type="radio" name="q_mod" id="mod4" value="Economic Power"><label for="mod4">Module 4 — Economic Power & Money Flow</label>
+    <input type="radio" name="q_mod" id="mod5" value="Career Readiness"><label for="mod5">Module 5 — Career Readiness & Leadership</label>
+    <input type="radio" name="q_mod" id="mod6" value="Community Impact"><label for="mod6">Module 6 — Community Impact Projects</label>
+  </div>
+</div>
 
-    <div class="nav-row">
-      <button class="btn-back" onclick="goTo(1)">← Back</button>
-      <button class="btn-next" onclick="goTo(3)">Next — Identity Capital →</button>
-    </div>
+<div class="nav-row">
+  <button class="btn-back" onclick="goTo(1)">← Back</button>
+  <button class="btn-next" onclick="goTo(3)">Next — Identity Capital →</button>
+</div>
+```
+
   </div>
 
   <!-- ======================== SECTION 3: IDENTITY CAPITAL ======================== -->
+
   <div class="section-block" id="section-3">
     <div class="section-eyebrow">Section 03 — Identity Capital Assessment</div>
     <h2 class="section-heading">Where did you grow?</h2>
     <p class="section-desc">Identity Capital is what you carry with you after you leave. Rate how much you feel each area grew during the 12 weeks. Be honest with yourself.</p>
 
-    <div class="callout">⭐⭐⭐⭐⭐ &nbsp; 1 star = didn't grow much &nbsp;·&nbsp; 5 stars = major growth</div>
+```
+<div class="callout">⭐⭐⭐⭐⭐ &nbsp; 1 star = didn't grow much &nbsp;·&nbsp; 5 stars = major growth</div>
 
-    <div class="ic-grid">
-      <div class="ic-card">
-        <div class="ic-name">Experiences (XP)</div>
-        <div class="ic-desc">Verified roles, projects, and things you actually completed</div>
-        <div class="ic-stars">
-          <input type="radio" name="ic_xp" id="xp5" value="5"><label for="xp5">⭐</label>
-          <input type="radio" name="ic_xp" id="xp4" value="4"><label for="xp4">⭐</label>
-          <input type="radio" name="ic_xp" id="xp3" value="3"><label for="xp3">⭐</label>
-          <input type="radio" name="ic_xp" id="xp2" value="2"><label for="xp2">⭐</label>
-          <input type="radio" name="ic_xp" id="xp1" value="1"><label for="xp1">⭐</label>
-        </div>
-      </div>
-
-      <div class="ic-card">
-        <div class="ic-name">Values</div>
-        <div class="ic-desc">Clarity on your decision logic and what you stand for under pressure</div>
-        <div class="ic-stars">
-          <input type="radio" name="ic_val" id="val5" value="5"><label for="val5">⭐</label>
-          <input type="radio" name="ic_val" id="val4" value="4"><label for="val4">⭐</label>
-          <input type="radio" name="ic_val" id="val3" value="3"><label for="val3">⭐</label>
-          <input type="radio" name="ic_val" id="val2" value="2"><label for="val2">⭐</label>
-          <input type="radio" name="ic_val" id="val1" value="1"><label for="val1">⭐</label>
-        </div>
-      </div>
-
-      <div class="ic-card">
-        <div class="ic-name">Skills</div>
-        <div class="ic-desc">Transferable abilities you can use in work, school, and community</div>
-        <div class="ic-stars">
-          <input type="radio" name="ic_sk" id="sk5" value="5"><label for="sk5">⭐</label>
-          <input type="radio" name="ic_sk" id="sk4" value="4"><label for="sk4">⭐</label>
-          <input type="radio" name="ic_sk" id="sk3" value="3"><label for="sk3">⭐</label>
-          <input type="radio" name="ic_sk" id="sk2" value="2"><label for="sk2">⭐</label>
-          <input type="radio" name="ic_sk" id="sk1" value="1"><label for="sk1">⭐</label>
-        </div>
-      </div>
-
-      <div class="ic-card">
-        <div class="ic-name">Network</div>
-        <div class="ic-desc">People who know you, trust you, and can vouch for you</div>
-        <div class="ic-stars">
-          <input type="radio" name="ic_net" id="net5" value="5"><label for="net5">⭐</label>
-          <input type="radio" name="ic_net" id="net4" value="4"><label for="net4">⭐</label>
-          <input type="radio" name="ic_net" id="net3" value="3"><label for="net3">⭐</label>
-          <input type="radio" name="ic_net" id="net2" value="2"><label for="net2">⭐</label>
-          <input type="radio" name="ic_net" id="net1" value="1"><label for="net1">⭐</label>
-        </div>
-      </div>
-
-      <div class="ic-card" style="grid-column: 1 / -1;">
-        <div class="ic-name">Culture / Swag / Aura</div>
-        <div class="ic-desc">Your ability to read rooms, signal strategically, and carry yourself without losing who you are</div>
-        <div class="ic-stars">
-          <input type="radio" name="ic_cult" id="cult5" value="5"><label for="cult5">⭐</label>
-          <input type="radio" name="ic_cult" id="cult4" value="4"><label for="cult4">⭐</label>
-          <input type="radio" name="ic_cult" id="cult3" value="3"><label for="cult3">⭐</label>
-          <input type="radio" name="ic_cult" id="cult2" value="2"><label for="cult2">⭐</label>
-          <input type="radio" name="ic_cult" id="cult1" value="1"><label for="cult1">⭐</label>
-        </div>
-      </div>
-    </div>
-
-    <hr class="divider">
-
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q11</span>Which of these capital elements felt most underdeveloped when you arrived?</div>
-      <div class="radio-options">
-        <input type="radio" name="q_weakest" id="w1" value="Experiences"><label for="w1">Experiences — I hadn't really completed much I could document</label>
-        <input type="radio" name="q_weakest" id="w2" value="Values"><label for="w2">Values — I wasn't clear on what I actually stood for</label>
-        <input type="radio" name="q_weakest" id="w3" value="Skills"><label for="w3">Skills — I had them but didn't know how to show them</label>
-        <input type="radio" name="q_weakest" id="w4" value="Network"><label for="w4">Network — I didn't have people in my corner who could open doors</label>
-        <input type="radio" name="q_weakest" id="w5" value="Culture/Swag"><label for="w5">Culture/Swag — I struggled to adapt without feeling fake</label>
-      </div>
-    </div>
-
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q12</span>Name one specific thing you can do NOW that you couldn't do when you walked in.</div>
-      <textarea class="survey-textarea" id="q_growth" placeholder="Be specific. Don't say 'communicate better' — say what you actually mean…" maxlength="400" oninput="updateCount(this,'count12',400)"></textarea>
-      <div class="char-count"><span id="count12">0</span>/400</div>
-    </div>
-
-    <div class="nav-row">
-      <button class="btn-back" onclick="goTo(2)">← Back</button>
-      <button class="btn-next" onclick="goTo(4)">Next — STURDY Check →</button>
+<div class="ic-grid">
+  <div class="ic-card">
+    <div class="ic-name">Experiences (XP)</div>
+    <div class="ic-desc">Verified roles, projects, and things you actually completed</div>
+    <div class="ic-stars">
+      <input type="radio" name="ic_xp" id="xp5" value="5"><label for="xp5">⭐</label>
+      <input type="radio" name="ic_xp" id="xp4" value="4"><label for="xp4">⭐</label>
+      <input type="radio" name="ic_xp" id="xp3" value="3"><label for="xp3">⭐</label>
+      <input type="radio" name="ic_xp" id="xp2" value="2"><label for="xp2">⭐</label>
+      <input type="radio" name="ic_xp" id="xp1" value="1"><label for="xp1">⭐</label>
     </div>
   </div>
 
+  <div class="ic-card">
+    <div class="ic-name">Values</div>
+    <div class="ic-desc">Clarity on your decision logic and what you stand for under pressure</div>
+    <div class="ic-stars">
+      <input type="radio" name="ic_val" id="val5" value="5"><label for="val5">⭐</label>
+      <input type="radio" name="ic_val" id="val4" value="4"><label for="val4">⭐</label>
+      <input type="radio" name="ic_val" id="val3" value="3"><label for="val3">⭐</label>
+      <input type="radio" name="ic_val" id="val2" value="2"><label for="val2">⭐</label>
+      <input type="radio" name="ic_val" id="val1" value="1"><label for="val1">⭐</label>
+    </div>
+  </div>
+
+  <div class="ic-card">
+    <div class="ic-name">Skills</div>
+    <div class="ic-desc">Transferable abilities you can use in work, school, and community</div>
+    <div class="ic-stars">
+      <input type="radio" name="ic_sk" id="sk5" value="5"><label for="sk5">⭐</label>
+      <input type="radio" name="ic_sk" id="sk4" value="4"><label for="sk4">⭐</label>
+      <input type="radio" name="ic_sk" id="sk3" value="3"><label for="sk3">⭐</label>
+      <input type="radio" name="ic_sk" id="sk2" value="2"><label for="sk2">⭐</label>
+      <input type="radio" name="ic_sk" id="sk1" value="1"><label for="sk1">⭐</label>
+    </div>
+  </div>
+
+  <div class="ic-card">
+    <div class="ic-name">Network</div>
+    <div class="ic-desc">People who know you, trust you, and can vouch for you</div>
+    <div class="ic-stars">
+      <input type="radio" name="ic_net" id="net5" value="5"><label for="net5">⭐</label>
+      <input type="radio" name="ic_net" id="net4" value="4"><label for="net4">⭐</label>
+      <input type="radio" name="ic_net" id="net3" value="3"><label for="net3">⭐</label>
+      <input type="radio" name="ic_net" id="net2" value="2"><label for="net2">⭐</label>
+      <input type="radio" name="ic_net" id="net1" value="1"><label for="net1">⭐</label>
+    </div>
+  </div>
+
+  <div class="ic-card" style="grid-column: 1 / -1;">
+    <div class="ic-name">Culture / Swag / Aura</div>
+    <div class="ic-desc">Your ability to read rooms, signal strategically, and carry yourself without losing who you are</div>
+    <div class="ic-stars">
+      <input type="radio" name="ic_cult" id="cult5" value="5"><label for="cult5">⭐</label>
+      <input type="radio" name="ic_cult" id="cult4" value="4"><label for="cult4">⭐</label>
+      <input type="radio" name="ic_cult" id="cult3" value="3"><label for="cult3">⭐</label>
+      <input type="radio" name="ic_cult" id="cult2" value="2"><label for="cult2">⭐</label>
+      <input type="radio" name="ic_cult" id="cult1" value="1"><label for="cult1">⭐</label>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q11</span>Which of these capital elements felt most underdeveloped when you arrived?</div>
+  <div class="radio-options">
+    <input type="radio" name="q_weakest" id="w1" value="Experiences"><label for="w1">Experiences — I hadn't really completed much I could document</label>
+    <input type="radio" name="q_weakest" id="w2" value="Values"><label for="w2">Values — I wasn't clear on what I actually stood for</label>
+    <input type="radio" name="q_weakest" id="w3" value="Skills"><label for="w3">Skills — I had them but didn't know how to show them</label>
+    <input type="radio" name="q_weakest" id="w4" value="Network"><label for="w4">Network — I didn't have people in my corner who could open doors</label>
+    <input type="radio" name="q_weakest" id="w5" value="Culture/Swag"><label for="w5">Culture/Swag — I struggled to adapt without feeling fake</label>
+  </div>
+</div>
+
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q12</span>Name one specific thing you can do NOW that you couldn't do when you walked in.</div>
+  <textarea class="survey-textarea" id="q_growth" placeholder="Be specific. Don't say 'communicate better' — say what you actually mean…" maxlength="400" oninput="updateCount(this,'count12',400)"></textarea>
+  <div class="char-count"><span id="count12">0</span>/400</div>
+</div>
+
+<div class="nav-row">
+  <button class="btn-back" onclick="goTo(2)">← Back</button>
+  <button class="btn-next" onclick="goTo(4)">Next — STURDY Check →</button>
+</div>
+```
+
+  </div>
+
   <!-- ======================== SECTION 4: STURDY ======================== -->
+
   <div class="section-block" id="section-4">
     <div class="section-eyebrow">Section 04 — STURDY Environment Audit</div>
     <h2 class="section-heading">Did this space hold up?</h2>
     <p class="section-desc">STURDY is the standard we hold the environment to — not just you. Rate how well the program delivered on each pillar. This is your audit.</p>
 
-    <div class="callout">1 = Failed this / 3 = Partially met it / 5 = Nailed it</div>
+```
+<div class="callout">1 = Failed this / 3 = Partially met it / 5 = Nailed it</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">S</span><strong>Safety & Stability</strong> — Consistent schedules, predictable adults, clear rules</div>
-      <div class="rating-scale">
-        <input type="radio" name="sturdy_s" id="ss1" value="1"><label for="ss1">1</label>
-        <input type="radio" name="sturdy_s" id="ss2" value="2"><label for="ss2">2</label>
-        <input type="radio" name="sturdy_s" id="ss3" value="3"><label for="ss3">3</label>
-        <input type="radio" name="sturdy_s" id="ss4" value="4"><label for="ss4">4</label>
-        <input type="radio" name="sturdy_s" id="ss5" value="5"><label for="ss5">5</label>
-      </div>
-      <div class="scale-ends"><span>Unstable</span><span>Rock solid</span></div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">S</span><strong>Safety & Stability</strong> — Consistent schedules, predictable adults, clear rules</div>
+  <div class="rating-scale">
+    <input type="radio" name="sturdy_s" id="ss1" value="1"><label for="ss1">1</label>
+    <input type="radio" name="sturdy_s" id="ss2" value="2"><label for="ss2">2</label>
+    <input type="radio" name="sturdy_s" id="ss3" value="3"><label for="ss3">3</label>
+    <input type="radio" name="sturdy_s" id="ss4" value="4"><label for="ss4">4</label>
+    <input type="radio" name="sturdy_s" id="ss5" value="5"><label for="ss5">5</label>
+  </div>
+  <div class="scale-ends"><span>Unstable</span><span>Rock solid</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">T</span><strong>Trauma-Awareness</strong> — No public shaming, staff stayed calm, I felt seen not judged</div>
-      <div class="rating-scale">
-        <input type="radio" name="sturdy_t" id="st1" value="1"><label for="st1">1</label>
-        <input type="radio" name="sturdy_t" id="st2" value="2"><label for="st2">2</label>
-        <input type="radio" name="sturdy_t" id="st3" value="3"><label for="st3">3</label>
-        <input type="radio" name="sturdy_t" id="st4" value="4"><label for="st4">4</label>
-        <input type="radio" name="sturdy_t" id="st5" value="5"><label for="st5">5</label>
-      </div>
-      <div class="scale-ends"><span>Felt exposed</span><span>Fully seen</span></div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">T</span><strong>Trauma-Awareness</strong> — No public shaming, staff stayed calm, I felt seen not judged</div>
+  <div class="rating-scale">
+    <input type="radio" name="sturdy_t" id="st1" value="1"><label for="st1">1</label>
+    <input type="radio" name="sturdy_t" id="st2" value="2"><label for="st2">2</label>
+    <input type="radio" name="sturdy_t" id="st3" value="3"><label for="st3">3</label>
+    <input type="radio" name="sturdy_t" id="st4" value="4"><label for="st4">4</label>
+    <input type="radio" name="sturdy_t" id="st5" value="5"><label for="st5">5</label>
+  </div>
+  <div class="scale-ends"><span>Felt exposed</span><span>Fully seen</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">U</span><strong>Uniform Access</strong> — Everyone got the same shot, no favorites, resources were fair</div>
-      <div class="rating-scale">
-        <input type="radio" name="sturdy_u" id="su1" value="1"><label for="su1">1</label>
-        <input type="radio" name="sturdy_u" id="su2" value="2"><label for="su2">2</label>
-        <input type="radio" name="sturdy_u" id="su3" value="3"><label for="su3">3</label>
-        <input type="radio" name="sturdy_u" id="su4" value="4"><label for="su4">4</label>
-        <input type="radio" name="sturdy_u" id="su5" value="5"><label for="su5">5</label>
-      </div>
-      <div class="scale-ends"><span>Unfair</span><span>Totally equitable</span></div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">U</span><strong>Uniform Access</strong> — Everyone got the same shot, no favorites, resources were fair</div>
+  <div class="rating-scale">
+    <input type="radio" name="sturdy_u" id="su1" value="1"><label for="su1">1</label>
+    <input type="radio" name="sturdy_u" id="su2" value="2"><label for="su2">2</label>
+    <input type="radio" name="sturdy_u" id="su3" value="3"><label for="su3">3</label>
+    <input type="radio" name="sturdy_u" id="su4" value="4"><label for="su4">4</label>
+    <input type="radio" name="sturdy_u" id="su5" value="5"><label for="su5">5</label>
+  </div>
+  <div class="scale-ends"><span>Unfair</span><span>Totally equitable</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">R</span><strong>Resilience & Restoration</strong> — Mistakes were handled with repair, not punishment or embarrassment</div>
-      <div class="rating-scale">
-        <input type="radio" name="sturdy_r" id="sr1" value="1"><label for="sr1">1</label>
-        <input type="radio" name="sturdy_r" id="sr2" value="2"><label for="sr2">2</label>
-        <input type="radio" name="sturdy_r" id="sr3" value="3"><label for="sr3">3</label>
-        <input type="radio" name="sturdy_r" id="sr4" value="4"><label for="sr4">4</label>
-        <input type="radio" name="sturdy_r" id="sr5" value="5"><label for="sr5">5</label>
-      </div>
-      <div class="scale-ends"><span>Punitive</span><span>Restorative</span></div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">R</span><strong>Resilience & Restoration</strong> — Mistakes were handled with repair, not punishment or embarrassment</div>
+  <div class="rating-scale">
+    <input type="radio" name="sturdy_r" id="sr1" value="1"><label for="sr1">1</label>
+    <input type="radio" name="sturdy_r" id="sr2" value="2"><label for="sr2">2</label>
+    <input type="radio" name="sturdy_r" id="sr3" value="3"><label for="sr3">3</label>
+    <input type="radio" name="sturdy_r" id="sr4" value="4"><label for="sr4">4</label>
+    <input type="radio" name="sturdy_r" id="sr5" value="5"><label for="sr5">5</label>
+  </div>
+  <div class="scale-ends"><span>Punitive</span><span>Restorative</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">D</span><strong>Developing You</strong> — I actually built something tangible — a document, skill, or artifact I can use</div>
-      <div class="rating-scale">
-        <input type="radio" name="sturdy_d" id="sd1" value="1"><label for="sd1">1</label>
-        <input type="radio" name="sturdy_d" id="sd2" value="2"><label for="sd2">2</label>
-        <input type="radio" name="sturdy_d" id="sd3" value="3"><label for="sd3">3</label>
-        <input type="radio" name="sturdy_d" id="sd4" value="4"><label for="sd4">4</label>
-        <input type="radio" name="sturdy_d" id="sd5" value="5"><label for="sd5">5</label>
-      </div>
-      <div class="scale-ends"><span>No output</span><span>Real artifacts</span></div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">D</span><strong>Developing You</strong> — I actually built something tangible — a document, skill, or artifact I can use</div>
+  <div class="rating-scale">
+    <input type="radio" name="sturdy_d" id="sd1" value="1"><label for="sd1">1</label>
+    <input type="radio" name="sturdy_d" id="sd2" value="2"><label for="sd2">2</label>
+    <input type="radio" name="sturdy_d" id="sd3" value="3"><label for="sd3">3</label>
+    <input type="radio" name="sturdy_d" id="sd4" value="4"><label for="sd4">4</label>
+    <input type="radio" name="sturdy_d" id="sd5" value="5"><label for="sd5">5</label>
+  </div>
+  <div class="scale-ends"><span>No output</span><span>Real artifacts</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Y</span><strong>Your Voice</strong> — My opinions mattered here. I could speak up and something actually changed</div>
-      <div class="rating-scale">
-        <input type="radio" name="sturdy_y" id="sy1" value="1"><label for="sy1">1</label>
-        <input type="radio" name="sturdy_y" id="sy2" value="2"><label for="sy2">2</label>
-        <input type="radio" name="sturdy_y" id="sy3" value="3"><label for="sy3">3</label>
-        <input type="radio" name="sturdy_y" id="sy4" value="4"><label for="sy4">4</label>
-        <input type="radio" name="sturdy_y" id="sy5" value="5"><label for="sy5">5</label>
-      </div>
-      <div class="scale-ends"><span>Voice ignored</span><span>Voice counted</span></div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Y</span><strong>Your Voice</strong> — My opinions mattered here. I could speak up and something actually changed</div>
+  <div class="rating-scale">
+    <input type="radio" name="sturdy_y" id="sy1" value="1"><label for="sy1">1</label>
+    <input type="radio" name="sturdy_y" id="sy2" value="2"><label for="sy2">2</label>
+    <input type="radio" name="sturdy_y" id="sy3" value="3"><label for="sy3">3</label>
+    <input type="radio" name="sturdy_y" id="sy4" value="4"><label for="sy4">4</label>
+    <input type="radio" name="sturdy_y" id="sy5" value="5"><label for="sy5">5</label>
+  </div>
+  <div class="scale-ends"><span>Voice ignored</span><span>Voice counted</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q13</span>Was there ever a moment where the environment felt unsafe or disrespectful? You don't have to name anyone — just describe what happened.</div>
-      <textarea class="survey-textarea" id="q_unsafe" placeholder="Optional. If nothing comes to mind, leave it blank. This helps us do better." maxlength="500" oninput="updateCount(this,'count13',500)"></textarea>
-      <div class="char-count"><span id="count13">0</span>/500</div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q13</span>Was there ever a moment where the environment felt unsafe or disrespectful? You don't have to name anyone — just describe what happened.</div>
+  <textarea class="survey-textarea" id="q_unsafe" placeholder="Optional. If nothing comes to mind, leave it blank. This helps us do better." maxlength="500" oninput="updateCount(this,'count13',500)"></textarea>
+  <div class="char-count"><span id="count13">0</span>/500</div>
+</div>
 
-    <div class="nav-row">
-      <button class="btn-back" onclick="goTo(3)">← Back</button>
-      <button class="btn-next" onclick="goTo(5)">Next — Your Story →</button>
-    </div>
+<div class="nav-row">
+  <button class="btn-back" onclick="goTo(3)">← Back</button>
+  <button class="btn-next" onclick="goTo(5)">Next — Your Story →</button>
+</div>
+```
+
   </div>
 
   <!-- ======================== SECTION 5: YOUR STORY ======================== -->
+
   <div class="section-block" id="section-5">
     <div class="section-eyebrow">Section 05 — Your Story</div>
     <h2 class="section-heading">In your own words.</h2>
     <p class="section-desc">These questions are about depth, not length. Say exactly what you mean. We read every single response.</p>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q14</span>Describe a real moment — inside or outside the program — where you made a different decision because of something you learned here.</div>
-      <textarea class="survey-textarea" id="q_decision" placeholder="Be specific. What was the situation? What did you actually do differently?" style="min-height: 130px;" maxlength="600" oninput="updateCount(this,'count14',600)"></textarea>
-      <div class="char-count"><span id="count14">0</span>/600</div>
-    </div>
+```
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q14</span>Describe a real moment — inside or outside the program — where you made a different decision because of something you learned here.</div>
+  <textarea class="survey-textarea" id="q_decision" placeholder="Be specific. What was the situation? What did you actually do differently?" style="min-height: 130px;" maxlength="600" oninput="updateCount(this,'count14',600)"></textarea>
+  <div class="char-count"><span id="count14">0</span>/600</div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q15</span>What was the hardest part of this program for you personally?</div>
-      <textarea class="survey-textarea" id="q_hardest" placeholder="Don't water it down. This is where we learn the most." maxlength="500" oninput="updateCount(this,'count15',500)"></textarea>
-      <div class="char-count"><span id="count15">0</span>/500</div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q15</span>What was the hardest part of this program for you personally?</div>
+  <textarea class="survey-textarea" id="q_hardest" placeholder="Don't water it down. This is where we learn the most." maxlength="500" oninput="updateCount(this,'count15',500)"></textarea>
+  <div class="char-count"><span id="count15">0</span>/500</div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q16</span>If you had to describe NextGen Success to another young person from your block in two sentences — what would you say?</div>
-      <textarea class="survey-textarea" id="q_pitch" placeholder="Not the brochure version — what would you actually say?" maxlength="300" oninput="updateCount(this,'count16',300)"></textarea>
-      <div class="char-count"><span id="count16">0</span>/300</div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q16</span>If you had to describe NextGen Success to another young person from your block in two sentences — what would you say?</div>
+  <textarea class="survey-textarea" id="q_pitch" placeholder="Not the brochure version — what would you actually say?" maxlength="300" oninput="updateCount(this,'count16',300)"></textarea>
+  <div class="char-count"><span id="count16">0</span>/300</div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q17</span>What is one thing the program should stop doing?</div>
-      <textarea class="survey-textarea" id="q_stop" placeholder="Be direct. We can take it." maxlength="400" oninput="updateCount(this,'count17',400)"></textarea>
-      <div class="char-count"><span id="count17">0</span>/400</div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q17</span>What is one thing the program should stop doing?</div>
+  <textarea class="survey-textarea" id="q_stop" placeholder="Be direct. We can take it." maxlength="400" oninput="updateCount(this,'count17',400)"></textarea>
+  <div class="char-count"><span id="count17">0</span>/400</div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q18</span>What is one thing the program should add or do more of?</div>
-      <textarea class="survey-textarea" id="q_add" placeholder="Something missing, something that almost happened, something you needed…" maxlength="400" oninput="updateCount(this,'count18',400)"></textarea>
-      <div class="char-count"><span id="count18">0</span>/400</div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q18</span>What is one thing the program should add or do more of?</div>
+  <textarea class="survey-textarea" id="q_add" placeholder="Something missing, something that almost happened, something you needed…" maxlength="400" oninput="updateCount(this,'count18',400)"></textarea>
+  <div class="char-count"><span id="count18">0</span>/400</div>
+</div>
 
-    <div class="nav-row">
-      <button class="btn-back" onclick="goTo(4)">← Back</button>
-      <button class="btn-next" onclick="goTo(6)">Next — What's Next →</button>
-    </div>
+<div class="nav-row">
+  <button class="btn-back" onclick="goTo(4)">← Back</button>
+  <button class="btn-next" onclick="goTo(6)">Next — What's Next →</button>
+</div>
+```
+
   </div>
 
   <!-- ======================== SECTION 6: WHAT'S NEXT ======================== -->
+
   <div class="section-block" id="section-6">
     <div class="section-eyebrow">Section 06 — Post-Program Pathways</div>
     <h2 class="section-heading">What are you moving toward?</h2>
     <p class="section-desc">This helps us track outcomes and connect you to the right resources after graduation. Select everything that applies.</p>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q19</span>What are you planning to do in the next 90 days? (Select all that apply)</div>
-      <div class="checkbox-options">
-        <input type="checkbox" id="p1" value="Job search"><label for="p1">Actively job searching</label>
-        <input type="checkbox" id="p2" value="College enrollment"><label for="p2">Enrolling in college or community college</label>
-        <input type="checkbox" id="p3" value="Trade certification"><label for="p3">Pursuing a trade, certification, or vocational training</label>
-        <input type="checkbox" id="p4" value="Starting a business"><label for="p4">Working on my own business or side hustle</label>
-        <input type="checkbox" id="p5" value="Internship/fellowship"><label for="p5">Applying for internships or fellowships</label>
-        <input type="checkbox" id="p6" value="Military"><label for="p6">Exploring military service</label>
-        <input type="checkbox" id="p7" value="Caregiving"><label for="p7">Managing caregiving responsibilities</label>
-        <input type="checkbox" id="p8" value="Figuring it out"><label for="p8">Still figuring it out — and that's okay</label>
-      </div>
-    </div>
+```
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q19</span>What are you planning to do in the next 90 days? (Select all that apply)</div>
+  <div class="checkbox-options">
+    <input type="checkbox" id="p1" value="Job search"><label for="p1">Actively job searching</label>
+    <input type="checkbox" id="p2" value="College enrollment"><label for="p2">Enrolling in college or community college</label>
+    <input type="checkbox" id="p3" value="Trade certification"><label for="p3">Pursuing a trade, certification, or vocational training</label>
+    <input type="checkbox" id="p4" value="Starting a business"><label for="p4">Working on my own business or side hustle</label>
+    <input type="checkbox" id="p5" value="Internship/fellowship"><label for="p5">Applying for internships or fellowships</label>
+    <input type="checkbox" id="p6" value="Military"><label for="p6">Exploring military service</label>
+    <input type="checkbox" id="p7" value="Caregiving"><label for="p7">Managing caregiving responsibilities</label>
+    <input type="checkbox" id="p8" value="Figuring it out"><label for="p8">Still figuring it out — and that's okay</label>
+  </div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q20</span>What is the biggest barrier standing between you and your next move right now?</div>
-      <div class="radio-options">
-        <input type="radio" name="q_barrier" id="b1" value="Documents/ID"><label for="b1">Identification or documentation issues</label>
-        <input type="radio" name="q_barrier" id="b2" value="Transportation"><label for="b2">Transportation or getting around the city</label>
-        <input type="radio" name="q_barrier" id="b3" value="Childcare"><label for="b3">Childcare or family obligations</label>
-        <input type="radio" name="q_barrier" id="b4" value="Criminal record"><label for="b4">Criminal record or legal system involvement</label>
-        <input type="radio" name="q_barrier" id="b5" value="Mental health"><label for="b5">Mental health or personal wellness</label>
-        <input type="radio" name="q_barrier" id="b6" value="Financial"><label for="b6">Financial stress or lack of savings</label>
-        <input type="radio" name="q_barrier" id="b7" value="Connections"><label for="b7">Not knowing the right people or where to start</label>
-        <input type="radio" name="q_barrier" id="b8" value="Confidence"><label for="b8">Honestly — confidence or believing I can do it</label>
-        <input type="radio" name="q_barrier" id="b9" value="None"><label for="b9">No major barrier right now — I'm ready</label>
-      </div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q20</span>What is the biggest barrier standing between you and your next move right now?</div>
+  <div class="radio-options">
+    <input type="radio" name="q_barrier" id="b1" value="Documents/ID"><label for="b1">Identification or documentation issues</label>
+    <input type="radio" name="q_barrier" id="b2" value="Transportation"><label for="b2">Transportation or getting around the city</label>
+    <input type="radio" name="q_barrier" id="b3" value="Childcare"><label for="b3">Childcare or family obligations</label>
+    <input type="radio" name="q_barrier" id="b4" value="Criminal record"><label for="b4">Criminal record or legal system involvement</label>
+    <input type="radio" name="q_barrier" id="b5" value="Mental health"><label for="b5">Mental health or personal wellness</label>
+    <input type="radio" name="q_barrier" id="b6" value="Financial"><label for="b6">Financial stress or lack of savings</label>
+    <input type="radio" name="q_barrier" id="b7" value="Connections"><label for="b7">Not knowing the right people or where to start</label>
+    <input type="radio" name="q_barrier" id="b8" value="Confidence"><label for="b8">Honestly — confidence or believing I can do it</label>
+    <input type="radio" name="q_barrier" id="b9" value="None"><label for="b9">No major barrier right now — I'm ready</label>
+  </div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q21</span>Do you want staff to follow up with you about opportunities, connections, or resources after the program ends?</div>
-      <div class="radio-options">
-        <input type="radio" name="q_followup" id="fu1" value="Yes"><label for="fu1">Yes — please reach out</label>
-        <input type="radio" name="q_followup" id="fu2" value="Maybe"><label for="fu2">Maybe — give me a few weeks first</label>
-        <input type="radio" name="q_followup" id="fu3" value="No"><label for="fu3">No — I'll reach out if I need something</label>
-      </div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q21</span>Do you want staff to follow up with you about opportunities, connections, or resources after the program ends?</div>
+  <div class="radio-options">
+    <input type="radio" name="q_followup" id="fu1" value="Yes"><label for="fu1">Yes — please reach out</label>
+    <input type="radio" name="q_followup" id="fu2" value="Maybe"><label for="fu2">Maybe — give me a few weeks first</label>
+    <input type="radio" name="q_followup" id="fu3" value="No"><label for="fu3">No — I'll reach out if I need something</label>
+  </div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q22</span>Best way to reach you going forward? (Optional — phone, email, Instagram handle, whatever works)</div>
-      <input type="text" class="survey-input" id="q_contact" placeholder="Phone, email, or DM handle…">
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q22</span>Best way to reach you going forward? (Optional — phone, email, Instagram handle, whatever works)</div>
+  <input type="text" class="survey-input" id="q_contact" placeholder="Phone, email, or DM handle…">
+</div>
 
-    <div class="nav-row">
-      <button class="btn-back" onclick="goTo(5)">← Back</button>
-      <button class="btn-next" onclick="goTo(7)">Final Section →</button>
-    </div>
+<div class="nav-row">
+  <button class="btn-back" onclick="goTo(5)">← Back</button>
+  <button class="btn-next" onclick="goTo(7)">Final Section →</button>
+</div>
+```
+
   </div>
 
   <!-- ======================== SECTION 7: FINAL REFLECTION ======================== -->
+
   <div class="section-block" id="section-7">
     <div class="section-eyebrow">Section 07 — Final Reflection</div>
     <h2 class="section-heading">Leave your mark.</h2>
     <p class="section-desc">This is the last page. Say what you need to say.</p>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q23</span>On a scale of 1–10, how different do you feel as a person compared to when you started?</div>
-      <div class="rating-scale">
-        <input type="radio" name="rs_overall" id="ov1" value="1"><label for="ov1">1</label>
-        <input type="radio" name="rs_overall" id="ov2" value="2"><label for="ov2">2</label>
-        <input type="radio" name="rs_overall" id="ov3" value="3"><label for="ov3">3</label>
-        <input type="radio" name="rs_overall" id="ov4" value="4"><label for="ov4">4</label>
-        <input type="radio" name="rs_overall" id="ov5" value="5"><label for="ov5">5</label>
-        <input type="radio" name="rs_overall" id="ov6" value="6"><label for="ov6">6</label>
-        <input type="radio" name="rs_overall" id="ov7" value="7"><label for="ov7">7</label>
-        <input type="radio" name="rs_overall" id="ov8" value="8"><label for="ov8">8</label>
-        <input type="radio" name="rs_overall" id="ov9" value="9"><label for="ov9">9</label>
-        <input type="radio" name="rs_overall" id="ov10" value="10"><label for="ov10">10</label>
-      </div>
-      <div class="scale-ends"><span>Same person</span><span>Completely different</span></div>
-    </div>
+```
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q23</span>On a scale of 1–10, how different do you feel as a person compared to when you started?</div>
+  <div class="rating-scale">
+    <input type="radio" name="rs_overall" id="ov1" value="1"><label for="ov1">1</label>
+    <input type="radio" name="rs_overall" id="ov2" value="2"><label for="ov2">2</label>
+    <input type="radio" name="rs_overall" id="ov3" value="3"><label for="ov3">3</label>
+    <input type="radio" name="rs_overall" id="ov4" value="4"><label for="ov4">4</label>
+    <input type="radio" name="rs_overall" id="ov5" value="5"><label for="ov5">5</label>
+    <input type="radio" name="rs_overall" id="ov6" value="6"><label for="ov6">6</label>
+    <input type="radio" name="rs_overall" id="ov7" value="7"><label for="ov7">7</label>
+    <input type="radio" name="rs_overall" id="ov8" value="8"><label for="ov8">8</label>
+    <input type="radio" name="rs_overall" id="ov9" value="9"><label for="ov9">9</label>
+    <input type="radio" name="rs_overall" id="ov10" value="10"><label for="ov10">10</label>
+  </div>
+  <div class="scale-ends"><span>Same person</span><span>Completely different</span></div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q24</span>Write a message to the next cohort — someone who's about to start the program where you started. What do you wish someone had told you?</div>
-      <textarea class="survey-textarea" id="q_message" placeholder="Write to them directly. You might be the reason they push through." style="min-height: 150px;" maxlength="700" oninput="updateCount(this,'count24',700)"></textarea>
-      <div class="char-count"><span id="count24">0</span>/700</div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q24</span>Write a message to the next cohort — someone who's about to start the program where you started. What do you wish someone had told you?</div>
+  <textarea class="survey-textarea" id="q_message" placeholder="Write to them directly. You might be the reason they push through." style="min-height: 150px;" maxlength="700" oninput="updateCount(this,'count24',700)"></textarea>
+  <div class="char-count"><span id="count24">0</span>/700</div>
+</div>
 
-    <div class="q-card">
-      <div class="q-label"><span class="q-num">Q25</span>Anything else you want to say — to the staff, the program, the foundation, or just to get off your chest?</div>
-      <textarea class="survey-textarea" id="q_final" placeholder="The floor is yours." style="min-height: 120px;" maxlength="600" oninput="updateCount(this,'count25',600)"></textarea>
-      <div class="char-count"><span id="count25">0</span>/600</div>
-    </div>
+<div class="q-card">
+  <div class="q-label"><span class="q-num">Q25</span>Anything else you want to say — to the staff, the program, the foundation, or just to get off your chest?</div>
+  <textarea class="survey-textarea" id="q_final" placeholder="The floor is yours." style="min-height: 120px;" maxlength="600" oninput="updateCount(this,'count25',600)"></textarea>
+  <div class="char-count"><span id="count25">0</span>/600</div>
+</div>
 
-    <div class="nav-row">
-      <button class="btn-back" onclick="goTo(6)">← Back</button>
-      <button class="btn-next" onclick="submitSurvey()" style="background: linear-gradient(135deg, #c9a84c, #e8c96b); font-size: 16px; padding: 16px 40px;">
-        Submit My Survey ✦
-      </button>
-    </div>
+<div class="nav-row">
+  <button class="btn-back" onclick="goTo(6)">← Back</button>
+  <button class="btn-next" onclick="submitSurvey()" style="background: linear-gradient(135deg, #c9a84c, #e8c96b); font-size: 16px; padding: 16px 40px;">
+    Submit My Survey ✦
+  </button>
+</div>
+```
+
   </div>
 
   <!-- ======================== THANK YOU ======================== -->
+
   <div class="thank-you" id="thankyou">
     <div class="ty-icon">✦</div>
     <h2 class="ty-heading">You did the <span>work.</span></h2>
@@ -1269,62 +1305,65 @@
   let currentSection = 1;
   const totalSections = 7;
 
-  // ── REQUIRED FIELDS PER SECTION ──────────────────────────────────────
-  // Each entry: { type, id/name, cardIndex (1-based within section) }
-  // optional:true means the field is skipped during validation
-  const REQUIRED = {
+  // ── VALIDATION RULES PER SECTION ─────────────────────────────────────
+  // type 'text'     → element with id must have non-empty value
+  // type 'radio'    → at least one input[name] must be :checked
+  // type 'checkbox' → at least one of the ids must be checked
+  // optional: true  → skipped entirely
+  const RULES = {
     1: [
-      { type: 'text',     id: 'q_name',        label: 'Please enter your name.' },
-      { type: 'radio',    name: 'q_age',        label: 'Please select your age group.' },
-      { type: 'text',     id: 'q_neighborhood', label: 'Please enter your neighborhood.' },
-      { type: 'checkbox', ids: ['s1','s2','s3','s4','s5'], label: 'Please select at least one option.' },
+      { type: 'text',     id: 'q_name',                                  msg: 'Please enter your name.' },
+      { type: 'radio',    name: 'q_age',                                  msg: 'Please select your age group.' },
+      { type: 'text',     id: 'q_neighborhood',                           msg: 'Please enter your neighborhood.' },
+      { type: 'checkbox', ids: ['s1','s2','s3','s4','s5'],                msg: 'Please select at least one status.' },
     ],
     2: [
-      { type: 'radio', name: 'rs1',   label: 'Please select a rating.' },
-      { type: 'radio', name: 'rs2',   label: 'Please select a rating.' },
-      { type: 'radio', name: 'rs3',   label: 'Please select a rating.' },
-      { type: 'radio', name: 'rs4',   label: 'Please select a rating.' },
-      { type: 'radio', name: 'rs5',   label: 'Please select a rating.' },
-      { type: 'radio', name: 'q_mod', label: 'Please select a module.' },
+      { type: 'radio', name: 'rs1',   msg: 'Please select a rating.' },
+      { type: 'radio', name: 'rs2',   msg: 'Please select a rating.' },
+      { type: 'radio', name: 'rs3',   msg: 'Please select a rating.' },
+      { type: 'radio', name: 'rs4',   msg: 'Please select a rating.' },
+      { type: 'radio', name: 'rs5',   msg: 'Please select a rating.' },
+      { type: 'radio', name: 'q_mod', msg: 'Please select a module.' },
     ],
     3: [
-      { type: 'radio', name: 'ic_xp',     label: 'Please rate your growth.' },
-      { type: 'radio', name: 'ic_val',    label: 'Please rate your growth.' },
-      { type: 'radio', name: 'ic_sk',     label: 'Please rate your growth.' },
-      { type: 'radio', name: 'ic_net',    label: 'Please rate your growth.' },
-      { type: 'radio', name: 'ic_cult',   label: 'Please rate your growth.' },
-      { type: 'radio', name: 'q_weakest', label: 'Please select an option.' },
-      { type: 'text',  id: 'q_growth',    label: 'Please answer this question.' },
+      { type: 'radio', name: 'ic_xp',     msg: 'Please rate your Experiences growth.' },
+      { type: 'radio', name: 'ic_val',    msg: 'Please rate your Values growth.' },
+      { type: 'radio', name: 'ic_sk',     msg: 'Please rate your Skills growth.' },
+      { type: 'radio', name: 'ic_net',    msg: 'Please rate your Network growth.' },
+      { type: 'radio', name: 'ic_cult',   msg: 'Please rate your Culture/Swag growth.' },
+      { type: 'radio', name: 'q_weakest', msg: 'Please select an option.' },
+      { type: 'text',  id:   'q_growth',  msg: 'Please answer this question.' },
     ],
     4: [
-      { type: 'radio', name: 'sturdy_s', label: 'Please select a rating.' },
-      { type: 'radio', name: 'sturdy_t', label: 'Please select a rating.' },
-      { type: 'radio', name: 'sturdy_u', label: 'Please select a rating.' },
-      { type: 'radio', name: 'sturdy_r', label: 'Please select a rating.' },
-      { type: 'radio', name: 'sturdy_d', label: 'Please select a rating.' },
-      { type: 'radio', name: 'sturdy_y', label: 'Please select a rating.' },
-      // Q13 (q_unsafe) is optional
+      { type: 'radio', name: 'sturdy_s', msg: 'Please select a rating.' },
+      { type: 'radio', name: 'sturdy_t', msg: 'Please select a rating.' },
+      { type: 'radio', name: 'sturdy_u', msg: 'Please select a rating.' },
+      { type: 'radio', name: 'sturdy_r', msg: 'Please select a rating.' },
+      { type: 'radio', name: 'sturdy_d', msg: 'Please select a rating.' },
+      { type: 'radio', name: 'sturdy_y', msg: 'Please select a rating.' },
+      // Q13 safety incident is intentionally optional
     ],
     5: [
-      { type: 'text', id: 'q_decision', label: 'Please answer this question.' },
-      { type: 'text', id: 'q_hardest',  label: 'Please answer this question.' },
-      { type: 'text', id: 'q_pitch',    label: 'Please answer this question.' },
-      { type: 'text', id: 'q_stop',     label: 'Please answer this question.' },
-      { type: 'text', id: 'q_add',      label: 'Please answer this question.' },
+      { type: 'text', id: 'q_decision', msg: 'Please answer this question.' },
+      { type: 'text', id: 'q_hardest',  msg: 'Please answer this question.' },
+      { type: 'text', id: 'q_pitch',    msg: 'Please answer this question.' },
+      { type: 'text', id: 'q_stop',     msg: 'Please answer this question.' },
+      { type: 'text', id: 'q_add',      msg: 'Please answer this question.' },
     ],
     6: [
-      { type: 'checkbox', ids: ['p1','p2','p3','p4','p5','p6','p7','p8'], label: 'Please select at least one option.' },
-      { type: 'radio',    name: 'q_barrier',  label: 'Please select an option.' },
-      { type: 'radio',    name: 'q_followup', label: 'Please select an option.' },
-      // Q22 (q_contact) is optional
+      { type: 'checkbox', ids: ['p1','p2','p3','p4','p5','p6','p7','p8'], msg: 'Please select at least one plan.' },
+      { type: 'radio',    name: 'q_barrier',  msg: 'Please select an option.' },
+      { type: 'radio',    name: 'q_followup', msg: 'Please select an option.' },
+      // Q22 contact info is intentionally optional
     ],
     7: [
-      { type: 'radio', name: 'rs_overall',  label: 'Please select a rating.' },
-      { type: 'text',  id: 'q_message',     label: 'Please write a message to the next cohort.' },
-      // Q25 (q_final) is optional
+      { type: 'radio', name: 'rs_overall', msg: 'Please select a rating.' },
+      { type: 'text',  id:   'q_message',  msg: 'Please write a message to the next cohort.' },
+      // Q25 final thoughts is intentionally optional
     ],
   };
 
+  // ── HELPERS ──────────────────────────────────────────────────────────
   function buildDots() {
     const container = document.getElementById('sectionDots');
     container.innerHTML = '';
@@ -1338,186 +1377,187 @@
   function updateProgress() {
     const pct = Math.round((currentSection / totalSections) * 100);
     document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('progressText').textContent = `Section ${currentSection} of ${totalSections}`;
+    document.getElementById('progressText').textContent = 'Section ' + currentSection + ' of ' + totalSections;
     document.getElementById('progressPct').textContent = pct + '%';
     buildDots();
   }
 
-  // Clear all error states in a section
-  function clearErrors(sectionEl) {
-    sectionEl.querySelectorAll('.q-card.error').forEach(c => c.classList.remove('error'));
+  // Given a rule, return the first DOM element associated with it (for card lookup)
+  function ruleAnchor(rule) {
+    if (rule.type === 'text')     return document.getElementById(rule.id);
+    if (rule.type === 'radio')    return document.querySelector('input[name="' + rule.name + '"]');
+    if (rule.type === 'checkbox') return document.getElementById(rule.ids[0]);
+    return null;
   }
 
-  // Find the q-card that wraps a given element
-  function cardOf(el) {
-    return el ? el.closest('.q-card') : null;
+  // Check whether a single rule passes
+  function rulePasses(rule) {
+    if (rule.type === 'text') {
+      const el = document.getElementById(rule.id);
+      return el && el.value.trim().length > 0;
+    }
+    if (rule.type === 'radio') {
+      return !!document.querySelector('input[name="' + rule.name + '"]:checked');
+    }
+    if (rule.type === 'checkbox') {
+      return rule.ids.some(function(id) {
+        const el = document.getElementById(id);
+        return el && el.checked;
+      });
+    }
+    return true;
   }
 
-  // Validate all required fields in the current section
-  // Returns true if valid, false + highlights errors if not
+  // ── VALIDATION ───────────────────────────────────────────────────────
   function validateSection(sectionNum) {
     const sectionEl = document.getElementById('section-' + sectionNum);
-    clearErrors(sectionEl);
-    const fields = REQUIRED[sectionNum] || [];
-    let firstError = null;
-    let valid = true;
+    const rules = RULES[sectionNum] || [];
 
-    for (const field of fields) {
-      let passed = false;
-      let targetEl = null;
+    // First, clear ALL previous error states in this section
+    sectionEl.querySelectorAll('.q-card').forEach(function(card) {
+      card.classList.remove('error');
+      const existing = card.querySelector('.error-msg');
+      if (existing) existing.remove();
+    });
 
-      if (field.type === 'text') {
-        const el = document.getElementById(field.id);
-        passed = el && el.value.trim().length > 0;
-        targetEl = el;
-      } else if (field.type === 'radio') {
-        const checked = document.querySelector(`input[name="${field.name}"]:checked`);
-        passed = !!checked;
-        // Find any label in this group to locate the card
-        targetEl = document.querySelector(`input[name="${field.name}"]`);
-      } else if (field.type === 'checkbox') {
-        passed = field.ids.some(id => document.getElementById(id)?.checked);
-        targetEl = document.getElementById(field.ids[0]);
-      }
+    var failed = [];
 
-      if (!passed) {
-        valid = false;
-        const card = cardOf(targetEl);
+    rules.forEach(function(rule) {
+      if (!rulePasses(rule)) {
+        var anchor = ruleAnchor(rule);
+        var card = anchor ? anchor.closest('.q-card') : null;
         if (card) {
-          card.classList.add('error');
-          // Inject error message if not already there
-          if (!card.querySelector('.error-msg')) {
-            const msg = document.createElement('p');
-            msg.className = 'error-msg';
-            msg.textContent = '⚠ ' + field.label;
-            card.appendChild(msg);
-          }
-          if (!firstError) firstError = card;
+          failed.push({ card: card, msg: rule.msg });
         }
       }
-    }
+    });
 
-    if (firstError) {
-      firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    return valid;
+    if (failed.length === 0) return true; // ✅ all good
+
+    // Mark every failed card
+    failed.forEach(function(f) {
+      f.card.classList.add('error');
+      var msgEl = document.createElement('p');
+      msgEl.className = 'error-msg';
+      msgEl.textContent = '⚠ ' + f.msg;
+      f.card.appendChild(msgEl);
+    });
+
+    // Scroll to the first error
+    failed[0].card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    return false; // ❌ blocked
   }
 
+  // ── NAVIGATION ───────────────────────────────────────────────────────
   function goTo(n) {
-    // If moving forward, validate current section first
+    // Going forward: must pass validation
     if (n > currentSection) {
-      if (!validateSection(currentSection)) return;
+      var passed = validateSection(currentSection);
+      if (!passed) return; // HARD STOP — do not advance
     }
+
+    // Going backward: clear errors on current section, no validation needed
+    if (n < currentSection) {
+      var sectionEl = document.getElementById('section-' + currentSection);
+      sectionEl.querySelectorAll('.q-card').forEach(function(card) {
+        card.classList.remove('error');
+        var existing = card.querySelector('.error-msg');
+        if (existing) existing.remove();
+      });
+    }
+
     document.getElementById('section-' + currentSection).classList.remove('active');
     currentSection = n;
-    const next = document.getElementById('section-' + currentSection);
-    next.classList.add('active');
+    document.getElementById('section-' + currentSection).classList.add('active');
     updateProgress();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // ── PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW ──────────────────
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMSz_4w-Ujwk9yyzeoxueGH_-8IgHf1wCUlJw3ldDq-JwbFb24U92lC4owCXGJyrzKBw/exec";
-  // ──────────────────────────────────────────────────────────────────────
-
-  function getChecked(name) {
-    return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
-      .map(el => el.value).join(", ");
+  // ── DATA COLLECTION ──────────────────────────────────────────────────
+  function getRadio(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
   }
 
   function getCheckboxGroup(ids) {
-    return ids.filter(id => document.getElementById(id)?.checked)
-      .map(id => document.getElementById(id)?.value).join(", ");
-  }
-
-  function getRadio(name) {
-    const el = document.querySelector(`input[name="${name}"]:checked`);
-    return el ? el.value : "";
+    return ids.filter(function(id) {
+      var el = document.getElementById(id);
+      return el && el.checked;
+    }).map(function(id) {
+      return document.getElementById(id).value;
+    }).join(', ');
   }
 
   function collectData() {
     return {
-      // Section 1
-      name:               document.getElementById('q_name')?.value || "",
+      name:               (document.getElementById('q_name') || {}).value || '',
       age:                getRadio('q_age'),
-      neighborhood:       document.getElementById('q_neighborhood')?.value || "",
+      neighborhood:       (document.getElementById('q_neighborhood') || {}).value || '',
       entryStatus:        getCheckboxGroup(['s1','s2','s3','s4','s5']),
-      // Section 2
       rs1:                getRadio('rs1'),
       rs2:                getRadio('rs2'),
       rs3:                getRadio('rs3'),
       rs4:                getRadio('rs4'),
       rs5:                getRadio('rs5'),
       bestModule:         getRadio('q_mod'),
-      // Section 3
       ic_xp:              getRadio('ic_xp'),
       ic_val:             getRadio('ic_val'),
       ic_sk:              getRadio('ic_sk'),
       ic_net:             getRadio('ic_net'),
       ic_cult:            getRadio('ic_cult'),
       weakestIC:          getRadio('q_weakest'),
-      growthStatement:    document.getElementById('q_growth')?.value || "",
-      // Section 4
+      growthStatement:    (document.getElementById('q_growth') || {}).value || '',
       sturdy_s:           getRadio('sturdy_s'),
       sturdy_t:           getRadio('sturdy_t'),
       sturdy_u:           getRadio('sturdy_u'),
       sturdy_r:           getRadio('sturdy_r'),
       sturdy_d:           getRadio('sturdy_d'),
       sturdy_y:           getRadio('sturdy_y'),
-      safetyIncident:     document.getElementById('q_unsafe')?.value || "",
-      // Section 5
-      decisionChanged:    document.getElementById('q_decision')?.value || "",
-      hardestPart:        document.getElementById('q_hardest')?.value || "",
-      streetPitch:        document.getElementById('q_pitch')?.value || "",
-      stopDoing:          document.getElementById('q_stop')?.value || "",
-      addMore:            document.getElementById('q_add')?.value || "",
-      // Section 6
+      safetyIncident:     (document.getElementById('q_unsafe') || {}).value || '',
+      decisionChanged:    (document.getElementById('q_decision') || {}).value || '',
+      hardestPart:        (document.getElementById('q_hardest') || {}).value || '',
+      streetPitch:        (document.getElementById('q_pitch') || {}).value || '',
+      stopDoing:          (document.getElementById('q_stop') || {}).value || '',
+      addMore:            (document.getElementById('q_add') || {}).value || '',
       plans90Day:         getCheckboxGroup(['p1','p2','p3','p4','p5','p6','p7','p8']),
       biggestBarrier:     getRadio('q_barrier'),
       followUp:           getRadio('q_followup'),
-      contactInfo:        document.getElementById('q_contact')?.value || "",
-      // Section 7
+      contactInfo:        (document.getElementById('q_contact') || {}).value || '',
       transformationScore: getRadio('rs_overall'),
-      messageToNext:      document.getElementById('q_message')?.value || "",
-      finalThoughts:      document.getElementById('q_final')?.value || "",
+      messageToNext:      (document.getElementById('q_message') || {}).value || '',
+      finalThoughts:      (document.getElementById('q_final') || {}).value || '',
     };
   }
 
-  async function submitSurvey() {
-    // Validate final section before submitting
-    if (!validateSection(7)) return;
+  // ── SUBMISSION ───────────────────────────────────────────────────────
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMSz_4w-Ujwk9yyzeoxueGH_-8IgHf1wCUlJw3ldDq-JwbFb24U92lC4owCXGJyrzKBw/exec";
 
-    // Show loading state on button
-    const btn = document.querySelector('#section-7 .btn-next');
+  async function submitSurvey() {
+    // Validate section 7 before allowing submission
+    if (!validateSection(7)) return; // HARD STOP
+
+    var btn = document.querySelector('#section-7 .btn-next');
     btn.textContent = 'Submitting…';
     btn.disabled = true;
     btn.style.opacity = '0.7';
 
-    const data = collectData();
-
-    // Check if URL has been set
-    if (SCRIPT_URL === "PASTE_YOUR_WEB_APP_URL_HERE") {
-      // Dev mode — just show thank you without posting
-      console.log("Survey data (no endpoint set):", data);
-      showThankYou();
-      return;
-    }
+    var data = collectData();
 
     try {
       await fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors", // Required for Apps Script
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      // no-cors means we can't read the response — but if no error thrown, it went through
       showThankYou();
     } catch (err) {
-      console.error("Submission error:", err);
-      btn.textContent = 'Submit My Survey ✦';
+      console.error('Submission error:', err);
+      btn.textContent = 'Submit My Survey ✶';
       btn.disabled = false;
       btn.style.opacity = '1';
-      alert("Something went wrong. Please try again or let a staff member know.");
+      alert('Something went wrong. Please try again or let a staff member know.');
     }
   }
 
@@ -1538,5 +1578,6 @@
   // Init
   buildDots();
 </script>
+
 </body>
 </html>
